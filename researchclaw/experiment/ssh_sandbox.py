@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -17,7 +18,12 @@ import uuid
 from pathlib import Path
 
 from researchclaw.config import SshRemoteConfig
-from researchclaw.experiment.sandbox import SandboxResult, parse_metrics
+from researchclaw.experiment.sandbox import (
+    SandboxResult,
+    parse_metrics,
+    validate_entry_point,
+    validate_entry_point_resolved,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +72,8 @@ class SshRemoteSandbox:
         *,
         entry_point: str = "main.py",
         timeout_sec: int = 300,
+        args: list[str] | None = None,
+        env_overrides: dict[str, str] | None = None,
     ) -> SandboxResult:
         """Run a multi-file experiment project on the remote host."""
         self._run_counter += 1
@@ -73,6 +81,14 @@ class SshRemoteSandbox:
         if staging.exists():
             shutil.rmtree(staging)
         staging.mkdir(parents=True, exist_ok=True)
+
+        # Pre-copy syntax validation — fail fast before any I/O
+        err = validate_entry_point(entry_point)
+        if err:
+            return SandboxResult(
+                returncode=-1, stdout="", stderr=err,
+                elapsed_sec=0.0, metrics={},
+            )
 
         self._inject_harness(staging)
 
@@ -88,6 +104,14 @@ class SshRemoteSandbox:
             elif src_item.is_file():
                 dest.write_bytes(src_item.read_bytes())
 
+        # Post-copy resolve check — catches symlink-based escapes
+        err = validate_entry_point_resolved(staging, entry_point)
+        if err:
+            return SandboxResult(
+                returncode=-1, stdout="", stderr=err,
+                elapsed_sec=0.0, metrics={},
+            )
+
         entry = staging / entry_point
         if not entry.exists():
             return SandboxResult(
@@ -98,7 +122,13 @@ class SshRemoteSandbox:
                 metrics={},
             )
 
-        return self._execute(staging, entry_point=entry_point, timeout_sec=timeout_sec)
+        return self._execute(
+            staging,
+            entry_point=entry_point,
+            timeout_sec=timeout_sec,
+            entry_args=args,
+            env_overrides=env_overrides,
+        )
 
     # ------------------------------------------------------------------
     # Static helpers
@@ -137,7 +167,13 @@ class SshRemoteSandbox:
     # ------------------------------------------------------------------
 
     def _execute(
-        self, staging_dir: Path, *, entry_point: str, timeout_sec: int
+        self,
+        staging_dir: Path,
+        *,
+        entry_point: str,
+        timeout_sec: int,
+        entry_args: list[str] | None = None,
+        env_overrides: dict[str, str] | None = None,
     ) -> SandboxResult:
         """Core execution flow for remote experiments.
 
@@ -181,7 +217,7 @@ class SshRemoteSandbox:
         for setup_cmd in cfg.setup_commands:
             setup_result = self._ssh_run(
                 f"cd {remote_dir_q} && {setup_cmd}",
-                timeout_sec=120,
+                timeout_sec=cfg.setup_timeout_sec,
             )
             if setup_result.returncode != 0:
                 logger.warning(
@@ -192,11 +228,17 @@ class SshRemoteSandbox:
         # 4. Execute experiment
         if cfg.use_docker:
             exec_cmd = self._build_docker_exec_cmd(
-                remote_dir, entry_point=entry_point,
+                remote_dir,
+                entry_point=entry_point,
+                args=entry_args,
+                env_overrides=env_overrides,
             )
         else:
             exec_cmd = self._build_bare_exec_cmd(
-                remote_dir, entry_point=entry_point,
+                remote_dir,
+                entry_point=entry_point,
+                args=entry_args,
+                env_overrides=env_overrides,
             )
 
         start = time.monotonic()
@@ -221,13 +263,27 @@ class SshRemoteSandbox:
         )
 
     def _build_bare_exec_cmd(
-        self, remote_dir: str, *, entry_point: str,
+        self,
+        remote_dir: str,
+        *,
+        entry_point: str,
+        args: list[str] | None = None,
+        env_overrides: dict[str, str] | None = None,
     ) -> str:
         """Build command to run Python directly on remote host (with basic sandboxing)."""
         cfg = self.config
         rd = shlex.quote(remote_dir)
         ep = shlex.quote(entry_point)
         py = shlex.quote(cfg.remote_python)
+        arg_text = " ".join(shlex.quote(arg) for arg in (args or []))
+        arg_suffix = f" {arg_text}" if arg_text else ""
+        _SAFE_ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+        env_parts = [
+            f"{name}={shlex.quote(value)}"
+            for name, value in sorted((env_overrides or {}).items())
+            if value and _SAFE_ENV_NAME.match(name)
+        ]
+        env_prefix = (" ".join(env_parts) + " ") if env_parts else ""
 
         gpu_env = ""
         if cfg.gpu_ids:
@@ -243,17 +299,24 @@ class SshRemoteSandbox:
             f"if command -v unshare >/dev/null 2>&1; then "
             f"HOME={rd} "
             f"{gpu_env}"
-            f"unshare --net {py} -u {ep}; "
+            f"{env_prefix}"
+            f"unshare --net {py} -u {ep}{arg_suffix}; "
             f"else "
             f"echo 'WARNING: unshare not available, running without network isolation' >&2; "
             f"HOME={rd} "
             f"{gpu_env}"
-            f"{py} -u {ep}; "
+            f"{env_prefix}"
+            f"{py} -u {ep}{arg_suffix}; "
             f"fi"
         )
 
     def _build_docker_exec_cmd(
-        self, remote_dir: str, *, entry_point: str,
+        self,
+        remote_dir: str,
+        *,
+        entry_point: str,
+        args: list[str] | None = None,
+        env_overrides: dict[str, str] | None = None,
     ) -> str:
         """Build command to run inside a Docker container on the remote host.
 
@@ -266,6 +329,10 @@ class SshRemoteSandbox:
             "docker", "run", "--rm",
             "-v", f"{shlex.quote(remote_dir)}:/workspace",
             "-w", "/workspace",
+            # BUG-DA8-14: Mirror local Docker sandbox security hardening
+            "-e", "HOME=/workspace/.home",
+            "-e", "TORCH_HOME=/workspace/.home/.cache/torch",
+            "-e", "MPLCONFIGDIR=/tmp/matplotlib",
             f"--memory={cfg.docker_memory_limit_mb}m",
             f"--shm-size={cfg.docker_shm_size_mb}m",
         ]
@@ -282,15 +349,26 @@ class SshRemoteSandbox:
             # Try to pass all GPUs; fails gracefully if none available
             parts.extend(["--gpus", "all"])
 
+        _SAFE_ENV = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+        if env_overrides:
+            for name, value in sorted(env_overrides.items()):
+                if not value or not _SAFE_ENV.match(name):
+                    continue
+                parts.extend(["-e", shlex.quote(f"{name}={value}")])
+
         parts.append(shlex.quote(cfg.docker_image))
         parts.extend(["python3", "-u", shlex.quote(entry_point)])
+        if args:
+            parts.extend(shlex.quote(arg) for arg in args)
 
         return " ".join(parts)
 
     def _ssh_run(
-        self, command: str, *, timeout_sec: int = 60
+        self, command: str, *, timeout_sec: int | None = None
     ) -> _SshResult:
         """Execute a command on the remote host via ssh."""
+        if timeout_sec is None:
+            timeout_sec = self.config.timeout_sec
         cmd = _build_ssh_base(self.config) + [command]
         try:
             cp = subprocess.run(
@@ -345,7 +423,8 @@ class SshRemoteSandbox:
 
         try:
             cp = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=60, check=False,
+                cmd, capture_output=True, text=True,
+                timeout=cfg.scp_timeout_sec, check=False,
             )
             if cp.returncode != 0:
                 logger.error("scp upload failed: %s", cp.stderr.strip())

@@ -2,6 +2,7 @@
 """Tests for ssh_remote and colab_drive experiment backends."""
 from __future__ import annotations
 
+import gc
 import json
 import textwrap
 import time
@@ -103,6 +104,19 @@ class TestSshRemoteSandboxCommands:
         cmd = sb._build_bare_exec_cmd("/tmp/rc-test", entry_point="main.py")
         assert "CUDA_VISIBLE_DEVICES" not in cmd
 
+    def test_bare_exec_cmd_forwards_args_and_env(self, tmp_path: Path):
+        cfg = SshRemoteConfig(host="server", user="test", remote_python="python3")
+        sb = SshRemoteSandbox(cfg, tmp_path)
+        cmd = sb._build_bare_exec_cmd(
+            "/tmp/rc-test",
+            entry_point="main.py",
+            args=["--foo", "bar baz"],
+            env_overrides={"A_ENV": "1", "B_ENV": "two words"},
+        )
+        assert "A_ENV=1" in cmd
+        assert "B_ENV='two words'" in cmd
+        assert "python3 -u main.py --foo 'bar baz'" in cmd
+
     def test_docker_exec_cmd(self, tmp_path: Path):
         cfg = SshRemoteConfig(
             host="server", user="test",
@@ -124,6 +138,23 @@ class TestSshRemoteSandboxCommands:
         assert "myimage:latest" in cmd
         assert cmd.endswith("main.py")
 
+    def test_docker_exec_cmd_forwards_args_and_env(self, tmp_path: Path):
+        cfg = SshRemoteConfig(
+            host="server",
+            user="test",
+            use_docker=True,
+            docker_image="myimage:latest",
+        )
+        sb = SshRemoteSandbox(cfg, tmp_path)
+        cmd = sb._build_docker_exec_cmd(
+            "/tmp/rc-test",
+            entry_point="main.py",
+            args=["--foo", "bar"],
+            env_overrides={"A_ENV": "1"},
+        )
+        assert "-e A_ENV=1" in cmd
+        assert cmd.endswith("main.py --foo bar")
+
     def test_docker_exec_full_network(self, tmp_path: Path):
         cfg = SshRemoteConfig(
             host="server", use_docker=True,
@@ -132,6 +163,46 @@ class TestSshRemoteSandboxCommands:
         sb = SshRemoteSandbox(cfg, tmp_path)
         cmd = sb._build_docker_exec_cmd("/tmp/rc-test", entry_point="main.py")
         assert "--network" not in cmd
+
+
+# ── Entry point path traversal validation ─────────────────────────────
+
+
+class TestSshEntryPointValidation:
+    def test_run_project_rejects_path_traversal(self, tmp_path: Path):
+        """run_project() must reject entry_point with '..' components."""
+        project = tmp_path / "proj"
+        project.mkdir()
+        (project / "main.py").write_text("print('hi')")
+
+        cfg = SshRemoteConfig(host="server", user="test")
+        work = tmp_path / "work"
+        sandbox = SshRemoteSandbox(cfg, work)
+        # Create escape target so .exists() alone wouldn't catch it
+        work.mkdir(parents=True, exist_ok=True)
+        (work / "escape.py").write_text("print('escaped!')")
+        # Mock _execute to ensure it's never reached
+        sandbox._execute = mock.MagicMock()  # type: ignore[assignment]
+        result = sandbox.run_project(project, entry_point="../escape.py")
+
+        assert result.returncode == -1
+        assert ".." in result.stderr
+        sandbox._execute.assert_not_called()
+
+    def test_run_project_rejects_absolute_path(self, tmp_path: Path):
+        """run_project() must reject absolute entry_point paths."""
+        project = tmp_path / "proj"
+        project.mkdir()
+        (project / "main.py").write_text("print('hi')")
+
+        cfg = SshRemoteConfig(host="server", user="test")
+        sandbox = SshRemoteSandbox(cfg, tmp_path / "work")
+        sandbox._execute = mock.MagicMock()  # type: ignore[assignment]
+        result = sandbox.run_project(project, entry_point="/etc/passwd")
+
+        assert result.returncode == -1
+        assert "relative" in result.stderr.lower() or "absolute" in result.stderr.lower()
+        sandbox._execute.assert_not_called()
 
 
 class TestSshConnectivityCheck:
@@ -395,3 +466,131 @@ class TestAcpTimeoutFix:
 
         client = ACPClient.from_rc_config(fake_rc)
         assert client.config.timeout_sec == 600
+
+
+# ===========================================================================
+# ACP session reconnect tests (Issue #52)
+# ===========================================================================
+
+class TestAcpSessionReconnect:
+    def test_reconnect_on_session_died(self):
+        """_send_prompt retries when session dies with 'agent needs reconnect'."""
+        from researchclaw.llm.acp_client import ACPClient, ACPConfig
+
+        client = ACPClient(ACPConfig(agent="claude"))
+        client._acpx = "/usr/bin/true"
+        client._session_ready = True
+
+        call_count = 0
+
+        def fake_cli(acpx: str, prompt: str) -> str:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise RuntimeError("ACP prompt failed (exit 1): agent needs reconnect")
+            return "success response"
+
+        client._send_prompt_cli = fake_cli  # type: ignore[assignment]
+        client._ensure_session = lambda: None  # type: ignore[assignment]
+        client._force_reconnect = lambda: None  # type: ignore[assignment]
+
+        result = client._send_prompt("test prompt")
+        assert result == "success response"
+        assert call_count == 2
+
+    def test_reconnect_exhausted_raises(self):
+        """_send_prompt raises after exhausting reconnect attempts."""
+        from researchclaw.llm.acp_client import ACPClient, ACPConfig
+
+        client = ACPClient(ACPConfig(agent="claude"))
+        client._acpx = "/usr/bin/true"
+        client._session_ready = True
+
+        def always_fail(acpx: str, prompt: str) -> str:
+            raise RuntimeError("ACP prompt failed (exit 1): session not found")
+
+        client._send_prompt_cli = always_fail  # type: ignore[assignment]
+        client._ensure_session = lambda: None  # type: ignore[assignment]
+        client._force_reconnect = lambda: None  # type: ignore[assignment]
+
+        import pytest
+        with pytest.raises(RuntimeError, match="session not found"):
+            client._send_prompt("test prompt")
+
+    def test_non_reconnectable_error_raises_immediately(self):
+        """_send_prompt does not retry on non-session errors."""
+        from researchclaw.llm.acp_client import ACPClient, ACPConfig
+
+        client = ACPClient(ACPConfig(agent="claude"))
+        client._acpx = "/usr/bin/true"
+        client._session_ready = True
+
+        call_count = 0
+
+        def fail_with_other_error(acpx: str, prompt: str) -> str:
+            nonlocal call_count
+            call_count += 1
+            raise RuntimeError("ACP prompt failed (exit 1): permission denied")
+
+        client._send_prompt_cli = fail_with_other_error  # type: ignore[assignment]
+        client._ensure_session = lambda: None  # type: ignore[assignment]
+
+        import pytest
+        with pytest.raises(RuntimeError, match="permission denied"):
+            client._send_prompt("test prompt")
+        assert call_count == 1  # no retry
+
+
+# ===========================================================================
+# ACP weakref accumulation tests (Issue #33)
+# ===========================================================================
+
+class TestAcpWeakrefCleanup:
+    def setup_method(self):
+        """Reset class state between tests."""
+        from researchclaw.llm.acp_client import ACPClient
+        ACPClient._live_instances.clear()
+        ACPClient._atexit_registered = False
+
+    def test_dead_weakrefs_pruned(self):
+        """Dead weakrefs are removed when a new instance is created."""
+        from researchclaw.llm.acp_client import ACPClient, ACPConfig
+
+        a = ACPClient(ACPConfig(agent="claude"))
+        b = ACPClient(ACPConfig(agent="claude"))
+        assert len(ACPClient._live_instances) == 2
+
+        del a
+        gc.collect()
+
+        c = ACPClient(ACPConfig(agent="claude"))
+        # Only b and c should remain (dead ref from 'a' pruned)
+        assert len(ACPClient._live_instances) == 2
+        live = [r() for r in ACPClient._live_instances]
+        assert b in live
+        assert c in live
+
+    def test_atexit_registered_once(self):
+        """atexit.register is called exactly once across multiple instances."""
+        with mock.patch("researchclaw.llm.acp_client.atexit") as mock_atexit:
+            from researchclaw.llm.acp_client import ACPClient, ACPConfig
+            ACPClient._atexit_registered = False
+            ACPClient(ACPConfig(agent="claude"))
+            ACPClient(ACPConfig(agent="claude"))
+            ACPClient(ACPConfig(agent="claude"))
+            assert mock_atexit.register.call_count == 1
+
+    def test_atexit_cleanup_closes_live_and_clears(self):
+        """_atexit_cleanup calls close() on live instances and clears list."""
+        from researchclaw.llm.acp_client import ACPClient, ACPConfig
+
+        a = ACPClient(ACPConfig(agent="claude"))
+        b = ACPClient(ACPConfig(agent="claude"))
+        a.close = mock.Mock()  # type: ignore[method-assign]
+        b.close = mock.Mock()  # type: ignore[method-assign]
+
+        ACPClient._atexit_cleanup()
+
+        a.close.assert_called_once()
+        b.close.assert_called_once()
+        assert len(ACPClient._live_instances) == 0

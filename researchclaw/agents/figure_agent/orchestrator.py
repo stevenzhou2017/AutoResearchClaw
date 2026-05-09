@@ -152,7 +152,11 @@ class FigureOrchestrator(AgentOrchestrator):
             min_figures=cfg.min_figures,
             max_figures=cfg.max_figures,
         )
-        self._codegen = CodeGenAgent(llm, output_format=cfg.output_format)
+        # BUG-60: Pass use_docker so CodeGen generates container-aware paths
+        self._codegen = CodeGenAgent(
+            llm, output_format=cfg.output_format,
+            use_docker=bool(cfg.use_docker) if cfg.use_docker is not None else False,
+        )
         self._renderer = RendererAgent(
             llm,
             timeout_sec=cfg.render_timeout_sec,
@@ -379,7 +383,16 @@ class FigureOrchestrator(AgentOrchestrator):
                 continue
 
             rendered = render_result.data.get("rendered", [])
-            final_rendered = rendered
+            # Merge newly rendered figures with previously passed figures
+            # (on retries, only failed figures are re-rendered)
+            if iteration == 0:
+                final_rendered = rendered
+            else:
+                # Replace entries for re-rendered figures, keep previously passed ones
+                re_rendered_ids = {r.get("figure_id") for r in rendered}
+                final_rendered = [
+                    r for r in final_rendered if r.get("figure_id") not in re_rendered_ids
+                ] + rendered
 
             # Critic
             self.logger.info(

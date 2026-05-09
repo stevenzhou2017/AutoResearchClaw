@@ -60,7 +60,7 @@ class CodeAgentConfig:
 
     # Phase 2.5: Hard validation gates (AST-based)
     hard_validation: bool = True
-    hard_validation_max_repairs: int = 2
+    hard_validation_max_repairs: int = 4
 
     # Phase 3: Execution-in-the-loop
     exec_fix_max_iterations: int = 3
@@ -92,6 +92,7 @@ class SolutionNode:
     # Evaluation
     runs_ok: bool = False
     returncode: int = -1
+    evaluated: bool = False
     stdout: str = ""
     stderr: str = ""
     metrics: dict[str, Any] = field(default_factory=dict)
@@ -170,6 +171,8 @@ class CodeAgent:
         stage_dir: Path,
         sandbox_factory: Any | None = None,
         experiment_config: Any | None = None,
+        domain_profile: Any | None = None,
+        code_search_result: Any | None = None,
     ) -> None:
         self._llm = llm
         self._pm = prompts
@@ -177,6 +180,8 @@ class CodeAgent:
         self._stage_dir = stage_dir
         self._sandbox_factory = sandbox_factory
         self._exp_config = experiment_config
+        self._domain_profile = domain_profile
+        self._code_search_result = code_search_result
         self._calls = 0
         self._runs = 0
         self._log: list[str] = []
@@ -240,12 +245,13 @@ class CodeAgent:
                 topic, exp_plan, metric, pkg_hint, arch_spec, max_tokens,
             )
             # Hard validation gates (E-03) for single-shot too
-            if self._cfg.hard_validation:
+            if self._cfg.hard_validation and files:
                 files = self._hard_validate_and_repair(
                     files, topic, exp_plan, metric, pkg_hint, arch_spec,
                 )
             best = SolutionNode(
-                node_id="single", files=files, runs_ok=True, score=1.0,
+                node_id="single", files=files,
+                runs_ok=bool(files), score=1.0 if files else 0.0,
             )
 
         # Phase 5: Review dialog
@@ -289,6 +295,16 @@ class CodeAgent:
             exp_plan=exp_plan,
             metric=metric,
         )
+
+        # Inject domain context and code search results into blueprint prompt
+        domain_context = self._build_domain_context()
+        if domain_context:
+            sp = type(sp)(
+                system=sp.system,
+                user=sp.user + "\n\n" + domain_context,
+            )
+            self._log_event("  Injected domain context into blueprint prompt")
+
         resp = self._chat(sp.system, sp.user, max_tokens=8192)
 
         # Extract YAML block from response
@@ -309,15 +325,133 @@ class CodeAgent:
 
         return arch_spec, blueprint
 
+    def _build_domain_context(self) -> str:
+        """Build domain-specific context for injection into prompts.
+
+        Includes:
+        - Domain profile hints (file structure, libraries, evaluation)
+        - Code search results (API patterns, reference code)
+        """
+        parts: list[str] = []
+
+        # Domain profile context
+        if self._domain_profile is not None:
+            try:
+                from researchclaw.domains.prompt_adapter import get_adapter
+                adapter = get_adapter(self._domain_profile)
+                blueprint_ctx = adapter.get_blueprint_context()
+                if blueprint_ctx:
+                    parts.append(
+                        "# Domain-Specific Guidance\n" + blueprint_ctx
+                    )
+            except Exception:
+                logger.debug("Failed to get domain context", exc_info=True)
+
+        # Code search results
+        if self._code_search_result is not None:
+            try:
+                prompt_ctx = self._code_search_result.to_prompt_context()
+                if prompt_ctx:
+                    parts.append(
+                        "# Reference Code from GitHub\n"
+                        "The following patterns were found in relevant open-source projects. "
+                        "Use them as reference for API usage and project structure.\n\n"
+                        + prompt_ctx
+                    )
+            except Exception:
+                logger.debug("Failed to get code search context", exc_info=True)
+
+        return "\n\n".join(parts)
+
     def _parse_blueprint(self, yaml_text: str) -> dict[str, Any] | None:
-        """Parse blueprint YAML into a structured dict."""
-        try:
-            import yaml
-            data = yaml.safe_load(yaml_text)
-            if isinstance(data, dict) and "files" in data:
-                return data
-        except Exception as exc:
-            self._log_event(f"  Blueprint YAML parse error: {exc}")
+        """Parse blueprint YAML into a structured dict.
+
+        BUG-178: LLM often includes Python type annotations in signature
+        values (e.g. ``signature: (self, name: str) -> Config``).  The
+        bare ``:`` breaks YAML parsing.  We quote unquoted signature
+        values before parsing.
+        """
+        import yaml
+
+        # Pre-process: sanitize values that contain Python type annotations,
+        # unclosed quotes, or other patterns that break YAML parsing.
+        import re as _bp_re
+        sanitized_lines = []
+        for line in yaml_text.split("\n"):
+            stripped = line.lstrip()
+            if not stripped or stripped.startswith("#"):
+                sanitized_lines.append(line)
+                continue
+
+            # Skip lines that are pure list markers or block scalars
+            if stripped.startswith(("- ", "---", "...")):
+                # For list items like `- key: value`, extract after `- `
+                if stripped.startswith("- ") and ":" in stripped[2:]:
+                    inner = stripped[2:]
+                else:
+                    sanitized_lines.append(line)
+                    continue
+            elif ":" in stripped:
+                inner = stripped
+            else:
+                sanitized_lines.append(line)
+                continue
+
+            # Find the YAML key separator (first `:` followed by space or EOL)
+            m = _bp_re.search(r":\s", inner)
+            if not m:
+                sanitized_lines.append(line)
+                continue
+
+            val_part = inner[m.end():].strip()
+            if not val_part:
+                sanitized_lines.append(line)
+                continue
+
+            # Already properly quoted — skip
+            if val_part.startswith(("'", "|", ">")):
+                sanitized_lines.append(line)
+                continue
+
+            # Check if value needs quoting:
+            # 1) Contains `:` or `->` (type annotations)
+            # 2) Starts with `"` but doesn't end with `"` (unclosed quote)
+            # 3) Contains `[` with `:` (e.g. dict[str, float])
+            needs_quoting = False
+            if val_part.startswith('"'):
+                # Already quoted — check if properly closed
+                if not val_part.endswith('"') or val_part.count('"') % 2 != 0:
+                    needs_quoting = True  # unclosed or malformed quote
+                else:
+                    sanitized_lines.append(line)
+                    continue
+            elif ":" in val_part or "->" in val_part:
+                needs_quoting = True
+
+            if needs_quoting:
+                # Strip any existing partial quotes, escape internal quotes
+                clean = val_part.strip('"').replace('"', '\\"')
+                # Remove inline comments (# ...) to avoid YAML issues
+                comment_idx = clean.find("  #")
+                if comment_idx >= 0:
+                    clean = clean[:comment_idx].rstrip()
+                indent = line[:len(line) - len(stripped)]
+                prefix = stripped[:len(stripped) - len(inner)]  # e.g. "- "
+                key_sep = inner[:m.end()]
+                sanitized_lines.append(
+                    f'{indent}{prefix}{key_sep}"{clean}"'
+                )
+            else:
+                sanitized_lines.append(line)
+        sanitized = "\n".join(sanitized_lines)
+
+        for attempt_text in (sanitized, yaml_text):
+            try:
+                data = yaml.safe_load(attempt_text)
+                if isinstance(data, dict) and "files" in data:
+                    return data
+            except Exception as exc:
+                self._log_event(f"  Blueprint YAML parse error: {exc}")
         return None
 
     @staticmethod
@@ -668,11 +802,6 @@ class CodeAgent:
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom) and node.module:
                     mod_top = node.module.split(".")[0]
-                    if (
-                        mod_top in known_modules
-                        and mod_top not in known_modules
-                    ):
-                        pass  # impossible, skip
                     # Check if importing from a local module that exists
                     if mod_top in known_modules:
                         # Verify imported names exist in target file
@@ -701,6 +830,42 @@ class CodeAgent:
                                         f"'{name}' not defined in "
                                         f"'{target_file}' — will crash"
                                     )
+
+        # 7. BUG-R41-04: main.py MUST have an `if __name__ == "__main__"` block
+        #    and must call a training/experiment function — otherwise Docker runs
+        #    the file and exits 0 with no output.
+        main_code = files.get("main.py", "")
+        if main_code:
+            try:
+                main_tree = ast.parse(main_code)
+                has_main_guard = False
+                for node in ast.walk(main_tree):
+                    if isinstance(node, ast.If):
+                        # Check for `if __name__ == "__main__"` pattern
+                        test = node.test
+                        if isinstance(test, ast.Compare):
+                            left = test.left
+                            if (
+                                isinstance(left, ast.Name)
+                                and left.id == "__name__"
+                                and len(test.comparators) == 1
+                            ):
+                                comp = test.comparators[0]
+                                if (
+                                    isinstance(comp, ast.Constant)
+                                    and comp.value == "__main__"
+                                ):
+                                    has_main_guard = True
+                                    break
+                if not has_main_guard:
+                    critical.append(
+                        "[main.py] Missing `if __name__ == \"__main__\":` block — "
+                        "script will define functions/classes but never execute "
+                        "training. Add a main guard that calls the experiment entry "
+                        "point."
+                    )
+            except SyntaxError:
+                pass  # Already caught by syntax check above
 
         return critical, warnings
 
@@ -807,7 +972,7 @@ class CodeAgent:
 
             self._log_event(
                 f"  Exec-fix iter {i}: crashed (rc={result.returncode}), "
-                f"stderr={len(result.stderr)} chars"
+                f"stderr={len(result.stderr or '')} chars"
             )
             files = self._fix_runtime_error(files, result)
 
@@ -831,6 +996,17 @@ class CodeAgent:
                 "## ARCHITECTURE SPECIFICATION (follow this file and class structure)\n"
                 f"{arch_spec}\n"
             )
+
+        # BUG-004: Inject numerical stability requirements
+        hint += (
+            "\n\n## NUMERICAL STABILITY (MANDATORY)\n"
+            "- Add gradient clipping: `torch.nn.utils.clip_grad_norm_(params, 1.0)`\n"
+            "- After each optimizer step, check for NaN loss:\n"
+            "  `if torch.isnan(loss): print('FAIL: NaN detected'); break`\n"
+            "- When logging metrics, guard against NaN/Inf:\n"
+            "  `v = float(val); v = 0.0 if (math.isnan(v) or math.isinf(v)) else v`\n"
+            "- For RL: clip rewards to [-10, 10], use reward normalization\n"
+        )
 
         sp = self._pm.for_stage(
             "code_generation",
@@ -982,10 +1158,10 @@ class CodeAgent:
             f"## Other Files in Project\n{dep_summaries}\n\n"
             f"## Full File ({target_file}, {total_lines} lines)\n"
             f"```python\n{code}\n```\n\n"
-            "Output the COMPLETE fixed `{target_file}` in "
-            "```filename:{target_file}``` format. Fix the root cause, "
-            "not just the symptom."
-        ).format(target_file=target_file)
+            f"Output the COMPLETE fixed `{target_file}` in "
+            f"```filename:{target_file}``` format. Fix the root cause, "
+            f"not just the symptom."
+        )
 
         sys_prompt = (
             "You are a debugging expert. Fix the specific runtime error "
@@ -1031,7 +1207,7 @@ class CodeAgent:
         all_nodes: list[SolutionNode] = []
 
         # Generate initial candidates
-        n_cand = self._cfg.tree_search_candidates
+        n_cand = max(self._cfg.tree_search_candidates, 1)
         for k in range(n_cand):
             self._log_event(f"  Generating candidate {k + 1}/{n_cand}")
             files = self._generate_code(
@@ -1049,7 +1225,7 @@ class CodeAgent:
         for depth in range(self._cfg.tree_search_max_depth):
             # Evaluate unevaluated nodes
             for node in all_nodes:
-                if node.returncode == -1:
+                if not node.evaluated:
                     self._evaluate_node(node, metric)
 
             # Sort by score
@@ -1111,6 +1287,7 @@ class CodeAgent:
             node.files,
             timeout_sec=self._cfg.tree_search_eval_timeout_sec,
         )
+        node.evaluated = True
         node.returncode = result.returncode
         node.stdout = result.stdout
         node.stderr = result.stderr
@@ -1237,7 +1414,11 @@ class CodeAgent:
         run_dir = self._stage_dir / "agent_runs" / f"attempt_{self._runs:03d}"
         run_dir.mkdir(parents=True, exist_ok=True)
         for fname, code in files.items():
-            fpath = run_dir / fname
+            fpath = (run_dir / fname).resolve()
+            # BUG-CA-10: Prevent path traversal from LLM-generated filenames
+            if not fpath.is_relative_to(run_dir.resolve()):
+                self._log_event(f"  WARNING: Skipping path-traversal filename: {fname}")
+                continue
             fpath.parent.mkdir(parents=True, exist_ok=True)
             fpath.write_text(code, encoding="utf-8")
 
@@ -1292,8 +1473,11 @@ class CodeAgent:
                 return _as_dict(json.loads(m.group(1)))
             except (json.JSONDecodeError, ValueError):
                 pass
-        # First {...} object
-        m = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", text, re.DOTALL)
+        # First {...} object (supports up to 2 levels of nesting)
+        m = re.search(
+            r"\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}",
+            text, re.DOTALL,
+        )
         if m:
             try:
                 return _as_dict(json.loads(m.group(0)))

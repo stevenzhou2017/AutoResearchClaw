@@ -116,6 +116,21 @@ def test_check_llm_connectivity_pass() -> None:
     assert result.status == "pass"
 
 
+def test_check_llm_connectivity_uses_get_probe() -> None:
+    def fake_urlopen(
+        req: urllib.request.Request, timeout: int
+    ) -> _DummyHTTPResponse:
+        assert req.get_method() == "GET"
+        assert req.full_url == "https://api.example.com/v1/models"
+        assert timeout == 5
+        return _DummyHTTPResponse(status=200)
+
+    with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+        result = health.check_llm_connectivity("https://api.example.com/v1")
+
+    assert result.status == "pass"
+
+
 def test_check_llm_connectivity_timeout() -> None:
     with patch(
         "urllib.request.urlopen",
@@ -573,3 +588,34 @@ def test_run_doctor_acp_includes_agent_check(tmp_path: Path) -> None:
     assert "acp_agent" in check_names
     assert report.overall == "pass"
     assert len(report.checks) == 7
+
+
+def test_print_doctor_report_ascii_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    report = health.DoctorReport(
+        timestamp="2026-01-01T00:00:00+00:00",
+        checks=[health.CheckResult("python_version", "pass", "ok")],
+        overall="pass",
+    )
+
+    class _AsciiStdout:
+        encoding = "ascii"
+
+        def __init__(self) -> None:
+            self.parts: list[str] = []
+
+        def write(self, text: str) -> int:
+            text.encode(self.encoding)
+            self.parts.append(text)
+            return len(text)
+
+        def flush(self) -> None:
+            return None
+
+    fake_stdout = _AsciiStdout()
+    monkeypatch.setattr(health.sys, "stdout", fake_stdout)
+
+    health.print_doctor_report(report)
+
+    out = "".join(fake_stdout.parts)
+    assert "[OK] python_version: ok" in out
+    assert "Result: PASS" in out

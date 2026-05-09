@@ -1,21 +1,28 @@
 <p align="center">
-  <img src="../image/logo.png" width="800" alt="AutoResearchClaw Logo">
+  <img src="../image/logo.png" width="700" alt="AutoResearchClaw Logo">
 </p>
 
-<h2 align="center"><b>شارك فكرة. احصل على ورقة بحثية. مؤتمت بالكامل & ذاتي التطور.</b></h2>
+<h2 align="center"><b>شارك فكرة. احصل على ورقة بحثية. ذاتي، تعاوني ومتطور ذاتياً.</b></h2>
 
 
 
 <p align="center">
-  <i>تحدث مع <a href="#openclaw-integration">OpenClaw</a>: «ابحث عن X» → تمّ.</i>
+  <b><i><font size="5">تحدث مع <a href="#-تكامل-openclaw">OpenClaw</a>: «ابحث عن X» → تمّ.</font></i></b>
 </p>
+
+<p align="center">
+  <img src="../image/framework_v2.png" width="100%" alt="AutoResearchClaw Framework">
+</p>
+
 
 <p align="center">
   <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white" alt="Python 3.11+"></a>
-  <a href="#testing"><img src="https://img.shields.io/badge/Tests-1284%20passed-brightgreen?logo=pytest&logoColor=white" alt="1284 Tests Passed"></a>
+  <a href="#الاختبار"><img src="https://img.shields.io/badge/Tests-2699%20passed-brightgreen?logo=pytest&logoColor=white" alt="2699 Tests Passed"></a>
   <a href="https://github.com/aiming-lab/AutoResearchClaw"><img src="https://img.shields.io/badge/GitHub-AutoResearchClaw-181717?logo=github" alt="GitHub"></a>
-  <a href="#openclaw-integration"><img src="https://img.shields.io/badge/OpenClaw-Compatible-ff4444?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==" alt="OpenClaw Compatible"></a>
+  <a href="#-تكامل-openclaw"><img src="https://img.shields.io/badge/OpenClaw-Compatible-ff4444?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==" alt="OpenClaw Compatible"></a>
+  <a href="https://discord.gg/u4ksqW5P"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
+  <a href="#%EF%B8%8F-ethics-and-responsible-use"><img src="https://img.shields.io/badge/⚠️_Ethics-Read_Before_Use-orange" alt="Ethics Guidelines"></a>
 </p>
 
 <p align="center">
@@ -32,29 +39,71 @@
 </p>
 
 <p align="center">
-  <a href="integration-guide.md">📖 دليل التكامل</a>
+  <a href="showcase/SHOWCASE.md">🏆 معرض الأوراق</a> · <a href="HITL_GUIDE.md">🧑‍✈️ دليل مساعد الطيار</a> · <a href="integration-guide.md">📖 دليل التكامل</a> · <a href="https://discord.gg/u4ksqW5P">💬 مجتمع Discord</a>
 </p>
 
 ---
 
-## ⚡ سطر واحد للبدء
+<table>
+<tr>
+<td width="18%">
+<a href="showcase/SHOWCASE.md"><img src="showcase/thumbnails/paper_I_random_matrix-01.png" width="120" alt="ورقة نموذجية"/></a>
+</td>
+<td valign="middle">
+<b>🏆 معرض الأوراق المُولّدة</b><br><br>
+<b>8 أوراق في 8 مجالات</b> — الرياضيات، الإحصاء، الأحياء، الحوسبة، NLP، RL، الرؤية الحاسوبية، المتانة — مُولّدة بشكل مستقل تماماً أو بتوجيه مساعد الطيار Human-in-the-Loop.<br><br>
+<a href="showcase/SHOWCASE.md"><img src="https://img.shields.io/badge/عرض_المعرض_الكامل_→-جميع_الأوراق_الـ8-d73a49?style=for-the-badge" alt="عرض المعرض"></a>
+</td>
+</tr>
+</table>
+
+---
+
+> **🧪 نبحث عن مختبرين!** جرّب خط الأنابيب بفكرتك البحثية الخاصة — من أي مجال — و[أخبرنا برأيك](TESTER_GUIDE.md). ملاحظاتك تشكّل الإصدار القادم مباشرة. **[→ Testing Guide](TESTER_GUIDE.md)** | **[→ 中文测试指南](TESTER_GUIDE_CN.md)** | **[→ 日本語テストガイド](TESTER_GUIDE_JA.md)**
+
+---
+
+## 🔥 News
+- **[04/08/2026]** **إرشادات الأخلاقيات والاستخدام المسؤول!** — أضفنا إرشادات أخلاقية شاملة تغطي النزاهة الأكاديمية والشفافية والتحقق من الاقتباسات ومنع سوء الاستخدام. الأوراق المُنتجة بالذكاء الاصطناعي مسودات وليست أعمالاً نهائية — المراجعة البشرية ضرورية.
+- **[04/01/2026]** **v0.4.0** — **نظام مساعد الطيار Human-in-the-Loop** — لم يعد AutoResearchClaw مستقلاً بالكامل فحسب. نظام HITL الجديد يضيف 6 أوضاع تدخل (`full-auto`، `gate-only`، `checkpoint`، `step-by-step`، `co-pilot`، `custom`)، وسياسات لكل مرحلة، وتعاون عميق بين الإنسان والذكاء الاصطناعي. يتضمن: ورشة الأفكار لتطوير الفرضيات التعاوني، متصفح خطوط الأساس لمراجعة تصميم التجارب، الكاتب المشارك للورقة للصياغة التعاونية، SmartPause (تدخل ديناميكي مدفوع بالثقة)، تعلّم التدخل ALHF، التحقق من الادعاءات لمكافحة الهلوسة، حواجز ميزانية التكلفة، تفريع خط الأنابيب لاستكشاف فرضيات متوازية، وأوامر CLI (`attach`/`status`/`approve`/`reject`/`guide`). **[→ دليل HITL الكامل](HITL_GUIDE.md)**
+- **[03/30/2026]** **تحميل مرن للمهارات** — يدعم AutoResearchClaw الآن تحميل مهارات مفتوحة المصدر ومخصصة من أي تخصص لتعزيز تجربتك البحثية. 19 مهارة مُحمّلة مسبقاً متضمنة كمراجع جاهزة للاستخدام، تغطي الكتابة العلمية وتصميم التجارب والكيمياء والأحياء والمزيد — بما في ذلك مهارة [A-Evolve](https://github.com/A-EVO-Lab/a-evolve) للتطور الذكي ساهم بها المجتمع. حمّل مهاراتك عبر `researchclaw skills install` أو ضع `SKILL.md` في `.claude/skills/`. انظر [مكتبة المهارات](#-مكتبة-المهارات).
+- **[03/22/2026]** [v0.3.2](https://github.com/aiming-lab/AutoResearchClaw/releases/tag/v0.3.2) — **دعم متعدد المنصات + استقرار كبير** — يعمل AutoResearchClaw الآن مع أي وكيل متوافق مع ACP (Claude Code، Codex CLI، Copilot CLI، Gemini CLI، Kimi CLI) ويدعم منصات المراسلة (Discord، Telegram، Lark، WeChat) عبر جسر OpenClaw. واجهة خلفية جديدة لتوليد الكود عبر CLI-agent تفوّض المرحلتين 10 و13 لوكلاء CLI خارجيين مع التحكم في الميزانية وإدارة المهلة الزمنية. يتضمن نظام مكافحة التلفيق (VerifiedRegistry + حلقة تشخيص وإصلاح التجارب)، 100+ إصلاح أخطاء، إعادة هيكلة modular executor، كشف تلقائي لـ `--resume`، تعزيز إعادة محاولات LLM، وإصلاحات المجتمع.
+
+<details>
+<summary>الإصدارات السابقة</summary>
+
+- **[03/18/2026]** [v0.3.1](https://github.com/aiming-lab/AutoResearchClaw/releases/tag/v0.3.1) — **OpenCode Beast Mode + Community Contributions** — New "Beast Mode" routes complex code generation to [OpenCode](https://github.com/anomalyco/opencode) with automatic complexity scoring and graceful fallback. Added Novita AI provider support, thread-safety hardening, improved LLM output parsing robustness, and 20+ bug fixes from community PRs and internal audit.
+- **[03/17/2026]** [v0.3.0](https://github.com/aiming-lab/AutoResearchClaw/releases/tag/v0.3.0) — **MetaClaw Integration** — AutoResearchClaw now supports [MetaClaw](https://github.com/aiming-lab/MetaClaw) cross-run learning: pipeline failures → structured lessons → reusable skills, injected into all 23 stages. **+18.3%** robustness in controlled experiments. Opt-in (`metaclaw_bridge.enabled: true`), fully backward-compatible. See [Integration Guide](#-metaclaw-integration).
+- **[03/16/2026]** [v0.2.0](https://github.com/aiming-lab/AutoResearchClaw/releases/tag/v0.2.0) — Three multi-agent subsystems (CodeAgent, BenchmarkAgent, FigureAgent), hardened Docker sandbox with network-policy-aware execution, 4-round paper quality audit (AI-slop detection, 7-dim review scoring, NeurIPS checklist), and 15+ bug fixes from production runs.
+- **[03/15/2026]** [v0.1.0](https://github.com/aiming-lab/AutoResearchClaw/releases/tag/v0.1.0) — We release AutoResearchClaw: a fully autonomous 23-stage research pipeline that turns a single research idea into a conference-ready paper. No human intervention required.
+
+</details>
+
+---
+
+## ⚡ أمر واحد. ورقة واحدة.
 
 ```bash
-pip install -e . && researchclaw run --topic "Your research idea here" --auto-approve
+# مستقل تماماً — بدون تدخل بشري
+pip install -e . && researchclaw setup && researchclaw init && researchclaw run --topic "Your research idea here" --auto-approve
+
+# وضع مساعد الطيار — تعاون مع الذكاء الاصطناعي في نقاط القرار الرئيسية
+researchclaw run --topic "Your research idea here" --mode co-pilot
 ```
+
 
 ---
 
 ## 🤔 ما هذا؟
 
-لديك فكرة. تريد ورقة بحثية. **هذا كل شيء.**
+**أنت تفكر. AutoResearchClaw يكتب. أنت توجّه القرارات الرئيسية.**
 
-يأخذ AutoResearchClaw موضوعاً بحثياً وينتج بشكل مستقل ورقة أكاديمية كاملة — مع أدبيات حقيقية من arXiv و Semantic Scholar (متعدد المصادر، أولوية arXiv لتجنب تحديد المعدل)، وتجارب في بيئة معزولة واعية بالعتاد (كشف تلقائي لـ GPU/MPS/CPU)، وتحليل إحصائي، ومراجعة أقران، و LaTeX جاهز للمؤتمرات (يستهدف 5,000-6,500 كلمة لـ NeurIPS/ICML/ICLR). بدون مراقبة. بدون نسخ ولصق بين الأدوات.
+أعطِ موضوعاً بحثياً — احصل على ورقة أكاديمية كاملة مع أدبيات حقيقية من OpenAlex و Semantic Scholar و arXiv، وتجارب في بيئة معزولة واعية بالعتاد (كشف تلقائي لـ GPU/MPS/CPU)، وتحليل إحصائي، ومراجعة أقران متعددة الوكلاء، و LaTeX جاهز للمؤتمرات يستهدف NeurIPS/ICML/ICLR. شغّله بشكل مستقل تماماً، أو استخدم **وضع مساعد الطيار** لتوجيه الذكاء الاصطناعي في نقاط القرار الحاسمة — اختر اتجاهات البحث، راجع تصاميم التجارب، وشارك في كتابة الورقة. بدون مراجع مُلفّقة.
 
 <table>
 <tr><td>📄</td><td><code>paper_draft.md</code></td><td>ورقة أكاديمية كاملة (مقدمة، أعمال سابقة، المنهجية، التجارب، النتائج، الخاتمة)</td></tr>
 <tr><td>📐</td><td><code>paper.tex</code></td><td>LaTeX جاهز للمؤتمرات (قوالب NeurIPS / ICLR / ICML)</td></tr>
-<tr><td>📚</td><td><code>references.bib</code></td><td>مراجع BibTeX حقيقية من Semantic Scholar و arXiv — مُنقّحة تلقائياً لمطابقة الاستشهادات المضمّنة</td></tr>
+<tr><td>📚</td><td><code>references.bib</code></td><td>مراجع BibTeX حقيقية من OpenAlex و Semantic Scholar و arXiv — مُنقّحة تلقائياً لمطابقة الاستشهادات المضمّنة</td></tr>
 <tr><td>🔍</td><td><code>verification_report.json</code></td><td>تحقق من سلامة الاستشهادات على 4 طبقات + التحقق من الصلة (arXiv، CrossRef، DataCite، LLM)</td></tr>
 <tr><td>🧪</td><td><code>experiment runs/</code></td><td>كود مُولّد + نتائج البيئة المعزولة + مقاييس JSON منظمة</td></tr>
 <tr><td>📊</td><td><code>charts/</code></td><td>رسوم بيانية مُولّدة تلقائياً لمقارنة الظروف مع أشرطة الخطأ وفترات الثقة</td></tr>
@@ -63,67 +112,73 @@ pip install -e . && researchclaw run --topic "Your research idea here" --auto-ap
 <tr><td>📦</td><td><code>deliverables/</code></td><td>جميع المخرجات النهائية في مجلد واحد — جاهزة للترجمة على Overleaf</td></tr>
 </table>
 
-يعمل خط الأنابيب **من البداية إلى النهاية بدون تدخل بشري** (ما لم تقم بتهيئة مراحل البوابات للمراجعة اليدوية). عندما تفشل التجارب، يصلح نفسه. عندما لا تصمد الفرضيات، يغيّر المسار.
+يعمل خط الأنابيب **من البداية إلى النهاية** — بشكل مستقل تماماً أو بتعاون human-in-the-loop. عندما تفشل التجارب، يصلح نفسه. عندما لا تصمد الفرضيات، يغيّر المسار. عندما تكون الاستشهادات مُلفّقة، يزيلها. عندما تريد التوجيه، يتوقف ويستمع.
 
-### 🎯 جرّبه
+🌍 **شغّله من أي مكان.** AutoResearchClaw ليس مقيّدًا بمنصة واحدة. استخدمه مستقلاً عبر CLI، أو وصّله بـ [OpenClaw](https://github.com/openclaw/openclaw)، أو ادمجه مع أي وكيل متوافق مع ACP — 🤖 Claude Code، 💻 Codex CLI، 🐙 Copilot CLI، ♊ Gemini CLI، 🌙 Kimi CLI، وغيرها. بفضل جسر الرسائل في OpenClaw، يمكنك إطلاق بحث كامل من 💬 Discord، ✈️ Telegram، 🐦 Lark (飞书)، 💚 WeChat، أو أي منصة يستخدمها فريقك بالفعل. موضوع واحد كمُدخل، ورقة بحثية كمُخرج — بغض النظر عن المكان الذي تكتب منه.
+
+---
+
+## 🚀 البداية السريعة
 
 ```bash
-researchclaw run --topic "Agent-based Reinforcement Learning for Automated Scientific Discovery" --auto-approve
+# 1. استنساخ وتثبيت
+git clone https://github.com/aiming-lab/AutoResearchClaw.git
+cd AutoResearchClaw
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+
+# 2. الإعداد (تفاعلي — يثبّت OpenCode beast mode، يتحقق من Docker/LaTeX)
+researchclaw setup
+
+# 3. التهيئة
+researchclaw init          # تفاعلي: اختر مزوّد LLM، ينشئ config.arc.yaml
+# أو يدوياً: cp config.researchclaw.example.yaml config.arc.yaml
+
+# 4. التشغيل
+export OPENAI_API_KEY="sk-..."
+researchclaw run --config config.arc.yaml --topic "Your research idea" --auto-approve
 ```
+
+المخرجات → `artifacts/rc-YYYYMMDD-HHMMSS-<hash>/deliverables/` — LaTeX و BibTeX وكود التجارب والرسوم البيانية جاهزة للترجمة.
+
+<details>
+<summary>📝 الحد الأدنى من التهيئة المطلوبة</summary>
+
+```yaml
+project:
+  name: "my-research"
+
+research:
+  topic: "Your research topic here"
+
+llm:
+  base_url: "https://api.openai.com/v1"
+  api_key_env: "OPENAI_API_KEY"
+  primary_model: "gpt-4o"
+  fallback_models: ["gpt-4o-mini"]
+
+experiment:
+  mode: "sandbox"
+  sandbox:
+    python_path: ".venv/bin/python"
+```
+
+</details>
 
 ---
 
 ## 🧠 ما الذي يميّزه
 
-### 🔄 حلقة قرار PIVOT / REFINE
-
-لا يعمل خط الأنابيب بشكل خطي فقط. المرحلة 15 (RESEARCH_DECISION) تقيّم نتائج التجارب مقابل الفرضيات وتتخذ قراراً مستقلاً:
-
-- **PROCEED** — النتائج تدعم الفرضيات، الاستمرار في كتابة الورقة
-- **REFINE** — النتائج واعدة لكنها تحتاج تحسيناً، العودة لتحسين الكود/المعاملات
-- **PIVOT** — تم اكتشاف مشكلة جوهرية، إعادة البدء من توليد الفرضيات باتجاه جديد
-
-كل دورة PIVOT/REFINE **تحفظ نسخاً من المخرجات السابقة** (`stage-08_v1/`، `stage-08_v2/`، ...) بحيث لا يُفقد أي عمل ويمكن تتبع تطور القرارات بالكامل.
-
-### 🤖 نقاش متعدد الوكلاء
-
-تستخدم المراحل الحرجة بروتوكول نقاش منظم مع وجهات نظر متعددة من نماذج اللغة:
-
-- **توليد الفرضيات** — وكلاء متنوعون يقترحون ويتحدّون الأفكار
-- **تحليل النتائج** — متفائل ومتشكك وواقعي يحللون المخرجات
-- **مراجعة الأقران** — فحص اتساق المنهجية والأدلة (هل تدّعي الورقة 50 تجربة بينما الكود نفّذ 5 فقط؟)
-
-### 🧬 التطور: التعلّم الذاتي عبر التشغيلات
-
-كل تشغيل لخط الأنابيب يستخلص دروساً دقيقة — ليس فقط "فشلت" بل *لماذا*:
-
-- مبررات القرار من اختيارات PIVOT/REFINE
-- تحذيرات وقت التشغيل من stderr للتجارب (مثل `RuntimeWarning: division by zero`)
-- شذوذ المقاييس (NaN، Inf، سرعات تقارب متطابقة)
-
-هذه الدروس تُحفظ في مخزن JSONL مع **تثقيل بتناقص زمني بنصف عمر 30 يوماً** وتُحقن كطبقات إضافية في الأوامر النصية للتشغيلات المستقبلية. خط الأنابيب يتعلّم حرفياً من أخطائه.
-
-### 📚 قاعدة المعرفة
-
-كل تشغيل يبني قاعدة معرفة منظمة (مخزّنة في `docs/kb/`) مع 6 فئات:
-
-- **decisions/** — تصميم التجارب، بوابات الجودة، قرارات البحث، تخطيط الموارد، استراتيجيات البحث، أرشيفات المعرفة
-- **experiments/** — سجلات توليد الكود، تشغيلات التجارب، التحسينات التكرارية
-- **findings/** — التحقق من الاستشهادات، تحليل النتائج، تقارير التوليف
-- **literature/** — استخلاص المعرفة، جمع الأدبيات، نتائج الفرز
-- **questions/** — توليد الفرضيات، تفكيك المشكلة، تهيئة الموضوع
-- **reviews/** — تقارير التصدير/النشر، مسودات الأوراق، المخططات، المراجعات، مراجعات الأقران
-
-### 🛡️ الحارس المراقب (Sentinel Watchdog)
-
-مراقب جودة في الخلفية يكتشف المشاكل التي قد يفوتها خط الأنابيب الرئيسي:
-
-- **كشف أخطاء وقت التشغيل** — NaN/Inf في المقاييس، تحذيرات stderr تُغذّى مرة أخرى لنموذج اللغة للإصلاح المُستهدف
-- **اتساق الورقة والأدلة** — كود التجارب الفعلي ونتائج التشغيل وسجلات التحسين تُحقن في مراجعة الأقران
-- **تقييم صلة الاستشهادات** — إلى ما هو أبعد من التحقق من الوجود، يقيّم نموذج اللغة الصلة الموضوعية لكل مرجع
-- **فرض التقارب** — يكتشف التجارب ذات التكرار الثابت ويطالب بمعايير إيقاف مبكر مناسبة
-- **التحقق من الاستئصال** — يكتشف ظروف الاستئصال المكررة/المتطابقة ويُبلّغ عن المقارنات المعطلة
-- **حماية ضد التلفيق** — يمنع كتابة الورقة تماماً عندما لا تنتج التجارب أي مقاييس
+| القدرة | كيف يعمل |
+|-----------|-------------|
+| **🧑‍✈️ وضع مساعد الطيار** | 6 أوضاع تدخل — من مستقل تماماً إلى خطوة بخطوة. وجّه الذكاء الاصطناعي في القرارات الحاسمة (الفرضيات، خطوط الأساس، كتابة الورقة) أو دعه يعمل بحرية. SmartPause يكتشف تلقائياً متى يكون التدخل البشري مفيداً. |
+| **🔄 حلقة PIVOT / REFINE** | المرحلة 15 تقرر بشكل مستقل: PROCEED أو REFINE (تعديل المعاملات) أو PIVOT (اتجاه جديد). المخرجات تُحفظ بإصدارات تلقائياً. |
+| **🤖 نقاش متعدد الوكلاء** | توليد الفرضيات وتحليل النتائج ومراجعة الأقران تستخدم نقاشاً منظماً بوجهات نظر متعددة. |
+| **🧬 التعلّم الذاتي** | دروس مستخلصة من كل تشغيل (مبررات القرارات، تحذيرات وقت التشغيل، شذوذ المقاييس) مع تناقص زمني بنصف عمر 30 يوماً. التشغيلات المستقبلية تتعلم من الأخطاء السابقة. |
+| **📚 قاعدة المعرفة** | كل تشغيل يبني قاعدة معرفة منظمة عبر 6 فئات (قرارات، تجارب، اكتشافات، أدبيات، أسئلة، مراجعات). |
+| **🛡️ الحارس المراقب Sentinel** | مراقب جودة في الخلفية: كشف NaN/Inf، اتساق الورقة والأدلة، تقييم صلة الاستشهادات، حماية ضد التلفيق. |
+| **🔍 التحقق من الادعاءات** | فحص حقائق مضمّن: يستخلص الادعاءات من النص المُولّد بالذكاء الاصطناعي ويتحقق منها مقابل الأدبيات المجمّعة. يُبلّغ عن الاستشهادات غير المؤسسة والأرقام المُلفّقة. |
+| **🌿 استكشاف الفروع** | افرع خط الأنابيب لاستكشاف اتجاهات بحثية متعددة في وقت واحد، قارن النتائج جنباً إلى جنب، وادمج أفضل مسار. |
 
 ---
 
@@ -131,12 +186,9 @@ researchclaw run --topic "Agent-based Reinforcement Learning for Automated Scien
 
 <table>
 <tr>
-<td width="60">🦞</td>
-<td>
 
 **AutoResearchClaw هو خدمة متوافقة مع [OpenClaw](https://github.com/openclaw/openclaw).** قم بتثبيته في OpenClaw وابدأ بحثاً مستقلاً برسالة واحدة — أو استخدمه بشكل مستقل عبر سطر الأوامر أو Claude Code أو أي مساعد برمجة بالذكاء الاصطناعي.
 
-</td>
 </tr>
 </table>
 
@@ -182,13 +234,42 @@ openclaw_bridge:
 
 كل علامة تفعّل بروتوكول محوّل مُحدد النوع. عندما يوفر OpenClaw هذه الإمكانيات، تستهلكها المحوّلات بدون تغييرات في الكود. راجع [`integration-guide.md`](integration-guide.md) للتفاصيل الكاملة.
 
+### ACP (Agent Client Protocol)
+
+يمكن لـ AutoResearchClaw استخدام **أي وكيل برمجة متوافق مع ACP** كواجهة خلفية لنموذج اللغة — بدون الحاجة لمفاتيح API. يتواصل الوكيل عبر [acpx](https://github.com/openclaw/acpx)، ويحافظ على جلسة واحدة مستمرة عبر جميع مراحل خط الأنابيب الـ 23.
+
+| الوكيل | الأمر | ملاحظات |
+|-------|---------|-------|
+| Claude Code | `claude` | Anthropic |
+| Codex CLI | `codex` | OpenAI |
+| Copilot CLI | `gh` | GitHub |
+| Gemini CLI | `gemini` | Google |
+| OpenCode | `opencode` | SST |
+| Kimi CLI | `kimi` | Moonshot |
+
+```yaml
+# config.yaml — مثال ACP
+llm:
+  provider: "acp"
+  acp:
+    agent: "claude"   # أي أمر CLI لوكيل متوافق مع ACP
+    cwd: "."          # دليل العمل للوكيل
+  # لا حاجة لـ base_url أو api_key — الوكيل يدير مصادقته بنفسه.
+```
+
+```bash
+# فقط شغّل — الوكيل يستخدم بيانات اعتماده الخاصة
+researchclaw run --config config.yaml --topic "Your research idea" --auto-approve
+```
+
 ### 🛠️ طرق أخرى للتشغيل
 
 | الطريقة | الكيفية |
 |--------|-----|
-| **سطر أوامر مستقل** | `researchclaw run --topic "..." --auto-approve` |
+| **سطر أوامر مستقل** | `researchclaw run --topic "..." --auto-approve` (مستقل) أو `--mode co-pilot` (تعاوني) |
 | **واجهة Python البرمجية** | `from researchclaw.pipeline import Runner; Runner(config).run()` |
 | **Claude Code** | يقرأ `RESEARCHCLAW_CLAUDE.md` — فقط قل *"شغّل بحثاً عن [موضوع]"* |
+| **Copilot CLI** | `researchclaw run --topic "..."` مع `llm.acp.agent: "gh"` |
 | **OpenCode** | يقرأ `.claude/skills/` — نفس واجهة اللغة الطبيعية |
 | **أي واجهة ذكاء اصطناعي** | قدّم `RESEARCHCLAW_AGENTS.md` كسياق → الوكيل يبدأ تلقائياً |
 
@@ -220,6 +301,8 @@ Phase D: تصميم التجارب            Phase H: الإنهاء
 
 > **مراحل البوابات** (5، 9، 20) تتوقف للحصول على موافقة بشرية أو موافقة تلقائية مع `--auto-approve`. عند الرفض، يعود خط الأنابيب للخلف.
 
+> **وضع مساعد الطيار** (`--mode co-pilot`): تعاون عميق بين الإنسان والذكاء الاصطناعي في المراحل 7-8 (ورشة الأفكار)، المرحلة 9 (متصفح خطوط الأساس)، والمراحل 16-17 (الكاتب المشارك للورقة). المراحل الأخرى تُنفّذ تلقائياً مع مراقبة SmartPause.
+
 > **حلقات القرار**: يمكن للمرحلة 15 تفعيل REFINE (→ المرحلة 13) أو PIVOT (→ المرحلة 8)، مع إصدار تلقائي للمخرجات.
 
 <details>
@@ -229,7 +312,7 @@ Phase D: تصميم التجارب            Phase H: الإنهاء
 |-------|-------------|
 | **A: تحديد النطاق** | يفكك نموذج اللغة الموضوع إلى شجرة مشاكل منظمة مع أسئلة بحثية |
 | **A+: العتاد** | كشف تلقائي لـ GPU (NVIDIA CUDA / Apple MPS / CPU فقط)، تحذير إذا كان العتاد المحلي محدوداً، تكييف توليد الكود وفقاً لذلك |
-| **B: الأدبيات** | بحث متعدد المصادر (أولوية arXiv، ثم Semantic Scholar) عن أوراق حقيقية، فرز حسب الصلة، استخلاص بطاقات معرفية |
+| **B: الأدبيات** | بحث متعدد المصادر (OpenAlex → Semantic Scholar → arXiv) عن أوراق حقيقية، فرز حسب الصلة، استخلاص بطاقات معرفية |
 | **C: التوليف** | تجميع النتائج، تحديد فجوات البحث، توليد فرضيات قابلة للاختبار عبر نقاش متعدد الوكلاء |
 | **D: التصميم** | تصميم خطة التجارب، توليد كود Python قابل للتشغيل واعٍ بالعتاد (مستوى GPU → اختيار الحزم)، تقدير احتياجات الموارد |
 | **E: التنفيذ** | تشغيل التجارب في بيئة معزولة، كشف NaN/Inf وأخطاء وقت التشغيل، إصلاح ذاتي للكود عبر إصلاح مُستهدف بنموذج اللغة |
@@ -241,198 +324,248 @@ Phase D: تصميم التجارب            Phase H: الإنهاء
 
 ---
 
-## 🚀 البداية السريعة
+## ✨ الميزات الرئيسية
 
-### المتطلبات الأساسية
-
-- 🐍 Python 3.11+
-- 🔑 نقطة نهاية API متوافقة مع OpenAI لنموذج لغة (GPT-4o، GPT-5.x، أو أي مزود متوافق)
-
-### التثبيت
-
-```bash
-git clone https://github.com/aiming-lab/AutoResearchClaw.git
-cd AutoResearchClaw
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e .
-```
-
-### التهيئة
-
-```bash
-cp config.researchclaw.example.yaml config.arc.yaml
-```
-
-<details>
-<summary>📝 الحد الأدنى من التهيئة المطلوبة</summary>
-
-```yaml
-project:
-  name: "my-research"
-
-research:
-  topic: "Your research topic here"
-
-llm:
-  base_url: "https://api.openai.com/v1"     # Any OpenAI-compatible endpoint
-  api_key_env: "OPENAI_API_KEY"              # Env var name containing your key
-  primary_model: "gpt-4o"                    # Any model your endpoint supports
-  fallback_models: ["gpt-4o-mini"]
-  s2_api_key: ""                             # Optional: Semantic Scholar API key for higher rate limits
-
-experiment:
-  mode: "sandbox"
-  sandbox:
-    python_path: ".venv/bin/python"
-```
-
-</details>
-
-### التشغيل
-
-```bash
-# تعيين مفتاح API
-export OPENAI_API_KEY="sk-..."
-
-# 🚀 تشغيل خط الأنابيب الكامل
-researchclaw run --config config.arc.yaml --auto-approve
-
-# 🎯 تحديد موضوع مباشرة
-researchclaw run --config config.arc.yaml --topic "Transformer attention for time series" --auto-approve
-
-# ✅ التحقق من التهيئة
-researchclaw validate --config config.arc.yaml
-
-# ⏩ الاستئناف من مرحلة محددة
-researchclaw run --config config.arc.yaml --from-stage PAPER_OUTLINE --auto-approve
-```
-
-المخرجات → `artifacts/rc-YYYYMMDD-HHMMSS-<hash>/` مع دليل فرعي لكل مرحلة.
-
-جميع المخرجات النهائية للمستخدم تُجمع تلقائياً في مجلد **`deliverables/`** واحد:
-
-```
-artifacts/rc-YYYYMMDD-HHMMSS-<hash>/deliverables/
-├── paper_final.md             # الورقة النهائية (Markdown)
-├── paper.tex                  # LaTeX جاهز للمؤتمر
-├── references.bib             # قائمة مراجع BibTeX موثّقة (مُنقّحة تلقائياً)
-├── neurips_2025.sty           # ملف نمط المؤتمر (مختار تلقائياً)
-├── code/                      # كود التجارب + requirements.txt
-├── verification_report.json   # تقرير سلامة الاستشهادات
-├── charts/                    # رسوم بيانية للنتائج (مقارنة الظروف، أشرطة الخطأ)
-└── manifest.json              # فهرس المخرجات مع البيانات الوصفية
-```
-
-مجلد `deliverables/` **جاهز للترجمة** — يتضمن ملفات `.sty` و `.bst` الخاصة بالمؤتمر بحيث يمكنك ترجمة `paper.tex` مباشرة باستخدام `pdflatex` + `bibtex` أو رفعه إلى Overleaf بدون تحميل أي شيء إضافي.
+| الميزة | الوصف |
+|---------|------------|
+| **📚 أدبيات متعددة المصادر** | أوراق حقيقية من OpenAlex و Semantic Scholar و arXiv — توسيع الاستعلام، إزالة التكرار، قاطع دائرة مع تدهور أنيق |
+| **🔍 تحقق من الاستشهادات على 4 طبقات** | فحص arXiv ID → CrossRef/DataCite DOI → مطابقة عنوان Semantic Scholar → تقييم صلة LLM. المراجع المُلفّقة تُزال تلقائياً. |
+| **🖥️ تنفيذ واعٍ بالعتاد** | كشف تلقائي لـ GPU (NVIDIA CUDA / Apple MPS / CPU فقط) مع تكييف توليد الكود والاستيرادات ونطاق التجارب |
+| **🦾 OpenCode Beast Mode** | التجارب المعقدة تُوجّه تلقائياً إلى [OpenCode](https://github.com/anomalyco/opencode) — يولّد مشاريع متعددة الملفات مع بنى مخصصة وحلقات تدريب ودراسات استئصال. التثبيت عبر `researchclaw setup`. |
+| **🧪 تجارب في بيئة معزولة** | كود مُتحقق بـ AST، إطار غير قابل للتعديل، فشل سريع عند NaN/Inf، إصلاح ذاتي، تحسين تكراري (حتى 10 جولات)، التقاط نتائج جزئية |
+| **📝 كتابة بمستوى المؤتمرات** | قوالب NeurIPS/ICML/ICLR، صياغة قسم بقسم (5,000-6,500 كلمة)، حماية ضد التلفيق، حماية طول المراجعة، فرض مضاد لإخلاءات المسؤولية |
+| **📐 تبديل القوالب** | `neurips_2025`، `iclr_2026`، `icml_2026` — Markdown → LaTeX مع رياضيات وجداول وأشكال ومراجع تبادلية و `\cite{}` |
+| **🛡️ مكافحة التلفيق** | VerifiedRegistry يفرض بيانات تجارب حقيقية في الأوراق. تشخيص تلقائي للتجارب الفاشلة وإصلاحها قبل الكتابة. الأرقام غير المُتحقق منها تُنقّى. |
+| **🚦 بوابات الجودة** | 3 بوابات بمشاركة بشرية (المراحل 5، 9، 20) مع إمكانية التراجع. تخطّ باستخدام `--auto-approve`. |
+| **🧑‍✈️ مساعد الطيار HITL** | 6 أوضاع تدخل مع سياسات لكل مرحلة. ورشة الأفكار، متصفح خطوط الأساس، الكاتب المشارك للورقة للتعاون العميق. SmartPause، حواجز التكلفة، سياسات التصعيد، وتعلّم التدخل لسلامة الإنتاج. محوّلات CLI/WebSocket/MCP. |
+| **💰 حواجز التكلفة** | مراقبة الميزانية مع تنبيهات عتبات قابلة للتهيئة (50%/80%/100%). خط الأنابيب يتوقف تلقائياً عند تجاوز الميزانية. |
+| **🔐 قابلية إعادة الإنتاج** | مجاميع اختبارية SHA256 لجميع مخرجات المراحل. بيانات غير قابلة للتعديل للتحقق. تراجع متعدد المستويات مع لقطات مُصدّرة. |
 
 ---
 
-## ✨ الميزات الرئيسية
+## 🧑‍✈️ مساعد الطيار Human-in-the-Loop
 
-### 📚 بحث أدبيات متعدد المصادر
+**يقدّم AutoResearchClaw v0.4.0 نظام Human-in-the-Loop (HITL) متكاملاً** يحوّل خط الأنابيب من مستقل بالكامل إلى محرك بحث تعاوني بين الإنسان والذكاء الاصطناعي. اختر مستوى مشاركتك:
 
-تستعلم المرحلة 4 من **واجهات API أكاديمية حقيقية** — وليس أوراقاً مُتخيّلة من نموذج اللغة. تستخدم استراتيجية **أولوية arXiv** لتجنب تحديد معدل Semantic Scholar.
+### أوضاع التدخل
 
-- **arXiv API** (أساسي) — مسودات مع معرّفات arXiv وبيانات وصفية حقيقية، بدون حدود للمعدل
-- **Semantic Scholar API** (ثانوي) — أوراق حقيقية مع عناوين وملخصات وأماكن نشر وعدد استشهادات ومعرّفات DOI
-- **توسيع الاستعلام** — يولّد تلقائياً استعلامات أوسع (مسح، معيار مرجعي، متغيرات المقارنة) لتغطية شاملة (30-60 مرجعاً)
-- **إزالة التكرار التلقائية** — DOI → معرّف arXiv → مطابقة عناوين ضبابية
-- **توليد BibTeX** — إدخالات صالحة `@article{cite_key, ...}` مع بيانات وصفية حقيقية
-- **قاطع دائرة ثلاثي الحالات** — CLOSED → OPEN → HALF_OPEN مع تعافي بتأخير أسّي (لا يُعطّل نهائياً أبداً)
-- **تدهور أنيق** — فشل S2 لا يحجب نتائج arXiv؛ يعود لنتائج مُعزّزة بنموذج اللغة إذا فشلت جميع الواجهات
+| الوضع | الأمر | ماذا يفعل |
+|------|---------|-------------|
+| **مستقل تماماً** | `--auto-approve` | السلوك الأصلي — بدون تدخل بشري |
+| **بوابات فقط** | `--mode gate-only` | توقف عند 3 مراحل بوابات (5، 9، 20) للموافقة |
+| **نقاط تفتيش** | `--mode checkpoint` | توقف عند كل حدود طور (8 نقاط تفتيش) |
+| **مساعد الطيار** | `--mode co-pilot` | تعاون عميق في المراحل الحاسمة، تلقائي في البقية |
+| **خطوة بخطوة** | `--mode step-by-step` | توقف بعد كل مرحلة — تعلّم خط الأنابيب |
+| **سريع** | `--mode express` | مراجعة سريعة — فقط 3 بوابات أكثر أهمية |
 
-```python
-from researchclaw.literature import search_papers
+### سير عمل مساعد الطيار
 
-papers = search_papers("transformer attention mechanisms", limit=20)
-for p in papers:
-    print(f"{p.title} ({p.year}) — cited {p.citation_count}x")
-    print(p.to_bibtex())
+```
+You: researchclaw run --topic "Quantum noise as neural network regularization" --mode co-pilot
+
+خط الأنابيب يشغّل المراحل 1-7 تلقائياً...
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │  HITL | المرحلة 08: HYPOTHESIS_GEN                            │
+  │  مراجعة ما بعد المرحلة                                        │
+  │                                                             │
+  │  الفرضيات المذكورة: 3                                        │
+  │  درجة الجدّة: 0.72 (متوسطة)                                   │
+  │                                                             │
+  │  [a] موافقة  [r] رفض  [e] تعديل  [c] تعاون                   │
+  │  [i] حقن توجيه  [v] عرض المخرجات  [q] إلغاء                  │
+  └─────────────────────────────────────────────────────────────┘
+
+You: c  (بدء محادثة تعاونية)
+You: الفرضية 3 مثيرة لكنها تحتاج Dropout/Label Smoothing كخطوط أساس
+AI:  تم التحديث — أُضيف Dropout، Label Smoothing، MixUp، CutMix كخطوط أساس...
+You: approve
+
+خط الأنابيب يستمر بفرضيتك المُحسّنة...
 ```
 
-### 🔍 التحقق من الاستشهادات (المرحلة 23)
+### أوامر CLI
 
-بعد كتابة الورقة، تقوم المرحلة 23 بـ**التحقق الفعلي من كل مرجع** من حيث السلامة والصلة:
+```bash
+# البدء بوضع HITL
+researchclaw run --topic "..." --mode co-pilot
 
-| الطبقة | الطريقة | ما تتحقق منه |
-|-------|--------|----------------|
-| L1 | arXiv API `id_list` | الأوراق ذات معرّفات arXiv — تتحقق من وجود المعرّف فعلاً |
-| L2 | CrossRef `/works/{doi}` + احتياطي DataCite | الأوراق ذات DOI — تتحقق من أن DOI يعمل والعنوان يتطابق (DataCite تتعامل مع DOI الخاص بـ arXiv `10.48550`) |
-| L3 | Semantic Scholar + بحث عنوان arXiv | جميع المتبقية — مطابقة عناوين ضبابية (≥0.80 تشابه) |
-| L4 | تقييم صلة بنموذج اللغة | جميع المراجع الموثّقة — تقييم الصلة الموضوعية بالبحث |
+# الاتصال بخط أنابيب متوقف (من طرفية أخرى)
+researchclaw attach artifacts/rc-2026-xxx
 
-كل مرجع → **VERIFIED** ✅ · **SUSPICIOUS** ⚠️ · **HALLUCINATED** ❌ · **SKIPPED** ⏭️ · **LOW_RELEVANCE** 📉
+# التحقق من حالة خط الأنابيب و HITL
+researchclaw status artifacts/rc-2026-xxx
 
-**تنظيف تلقائي**: الاستشهادات المُلفّقة تُزال بصمت من نص الورقة (بدون علامات `[HALLUCINATED]`). إدخالات قائمة المراجع غير المُستشهد بها تُحذف. ملف `references.bib` النهائي يحتوي فقط على مراجع موثّقة ومُستشهد بها.
+# الموافقة/الرفض من طرفية أخرى أو سكريبت
+researchclaw approve artifacts/rc-2026-xxx --message "LGTM"
+researchclaw reject artifacts/rc-2026-xxx --reason "Missing key baseline"
 
-### 🖥️ تنفيذ واعٍ بالعتاد
+# حقن توجيه لمرحلة (حتى قبل تشغيلها)
+researchclaw guide artifacts/rc-2026-xxx --stage 9 --message "Use ResNet-50 as primary baseline"
+```
 
-تكتشف المرحلة 1 تلقائياً قدرات GPU المحلية وتكيّف خط الأنابيب بالكامل:
+### القدرات الرئيسية
 
-| المستوى | الكشف | السلوك |
-|------|-----------|----------|
-| **عالي** | GPU من NVIDIA مع ≥8 جيجابايت VRAM | توليد كود PyTorch/GPU كامل، تثبيت torch تلقائياً إذا كان مفقوداً |
-| **محدود** | NVIDIA <8 جيجابايت أو Apple MPS | تجارب خفيفة (<1 مليون معامل، ≤20 حقبة)، تحذير للمستخدم |
-| **CPU فقط** | لم يُكتشف GPU | NumPy/sklearn فقط، بدون استيراد torch، تحذير مع توصية بـ GPU عن بعد |
+| الميزة | الوصف |
+|---------|------------|
+| **ورشة الأفكار** | عصف ذهني وتقييم وتحسين الفرضيات تعاونياً (المرحلة 7-8) |
+| **متصفح خطوط الأساس** | الذكاء الاصطناعي يقترح خطوط أساس + الإنسان يضيف/يزيل + قائمة تحقق قابلية إعادة الإنتاج (المرحلة 9) |
+| **الكاتب المشارك للورقة** | صياغة قسم بقسم مع تحرير بشري وتنقيح بالذكاء الاصطناعي (المرحلة 16-19) |
+| **SmartPause** | توقف ديناميكي مدفوع بالثقة — يكتشف تلقائياً متى يكون التدخل البشري مفيداً |
+| **التحقق من الادعاءات** | فحص حقائق مضمّن مقابل الأدبيات المجمّعة — يُبلّغ عن الادعاءات غير المؤسسة |
+| **حواجز التكلفة** | مراقبة الميزانية مع تنبيهات عتبات 50%/80%/100% |
+| **تعلّم التدخل** | ALHF — يتعلم من أنماط مراجعتك لتحسين قرارات التوقف المستقبلية |
+| **استكشاف الفروع** | افرع خط الأنابيب لاستكشاف فرضيات متعددة، قارن، وادمج الأفضل |
+| **سياسة التصعيد** | إشعارات متدرجة (طرفية → Slack → بريد → توقف تلقائي) عند عدم المتابعة |
+| **3 محوّلات** | CLI (طرفية)، WebSocket (لوحة ويب)، MCP (وكلاء خارجيون) |
 
-ملف تعريف العتاد يُحفظ في `stage-01/hardware_profile.json` ويؤثر على توليد الكود واستيرادات البيئة المعزولة وقيود الأوامر النصية.
-
-### 🧪 تنفيذ التجارب في بيئة معزولة
-
-- **التحقق من الكود** — تحليل AST، قائمة بيضاء للاستيرادات، بدون I/O للملفات خارج البيئة المعزولة
-- **حارس ميزانية الحوسبة** — ميزانية زمنية (قابلة للتهيئة، الافتراضي 600 ثانية) تُحقن في أمر توليد الكود؛ يجب على نموذج اللغة تصميم تجارب تناسب مهلة البيئة المعزولة
-- **إطار التجارب** — ملف `experiment_harness.py` غير قابل للتعديل يُحقن في البيئة المعزولة مع حارس وقت `should_stop()`، رفض NaN/Inf في `report_metric()`، وكتابة النتائج في `finalize()` (مستوحى من نمط التقييم غير القابل للتعديل في karpathy/autoresearch)
-- **مخرجات منظمة** — التجارب تنتج `results.json` مع مقاييس مُحددة النوع (وليس فقط تحليل stdout)
-- **تحليل ذكي للمقاييس** — يُصفّي سطور السجل من المقاييس باستخدام كشف الكلمات المفتاحية (`is_metric_name()`)
-- **فشل سريع عند NaN/التباعد** — قيم NaN/Inf تُصفّى من المقاييس؛ خسارة متباعدة (>100) تُكتشف وتُبلّغ
-- **فرض التقارب** — الكود المُولّد يجب أن يتضمن معايير إيقاف مبكر، وليس عدد تكرارات ثابت
-- **كشف أخطاء وقت التشغيل** — مقاييس NaN/Inf وتحذيرات stderr (القسمة على صفر، الفيضان) تُكتشف تلقائياً
-- **إصلاح ذاتي** — مشاكل وقت التشغيل تُغذّى مرة أخرى لنموذج اللغة مع تشخيص مُستهدف لإصلاحات السبب الجذري (وليس try/except كحل مؤقت)
-- **تحسين تكراري** — المرحلة 13 تحلل النتائج وتعيد التشغيل مع كود/معاملات محسّنة (حتى 10 تكرارات، مع أوامر واعية بالمهلة)
-- **التقاط نتائج جزئية** — التجارب المنتهية المهلة مع مقاييس ملتقطة تحصل على حالة "partial" بدلاً من "failed"، مما يحفظ البيانات القابلة للاستخدام
-- **محاذاة الموضوع والتجربة** — فحص ما بعد التوليد بنموذج اللغة يضمن أن كود التجربة يختبر فعلاً موضوع البحث المُعلن
-
-### 📝 كتابة ورقة بمستوى المؤتمرات
-
-يستهدف خط أنابيب الكتابة معايير NeurIPS/ICML/ICLR (9+ صفحات، 5,000-6,500 كلمة):
-
-- **فرض سلامة البيانات** — كتابة الورقة تُحظر تماماً عندما لا تنتج التجارب مقاييس (يمنع نموذج اللغة من تلفيق النتائج)؛ تعليمات مضادة للتلفيق تُحقن في كل من أوامر المسودة والمراجعة
-- **أوامر بمستوى المؤتمرات** — الأوامر النظامية تتضمن مبادئ أساسية من تحليلات الأوراق المقبولة: الجِدّة، السرد، خطوط أساس قوية، استئصالات، صدق، قابلية التكرار؛ أسباب الرفض الشائعة مُبلّغة
-- **إرشادات العنوان والتأطير** — إشارة الجِدّة، اختبار القابلية للانتشار، بنية ملخص من 5 جمل، كشف العناوين العامة مع إعادة التوليد
-- **صياغة قسم بقسم** — 3 استدعاءات متسلسلة لنموذج اللغة (مقدمة+أعمال سابقة → منهجية+تجارب → نتائج+خاتمة) لتجنب اقتطاع المخرجات
-- **أهداف عدد كلمات لكل قسم** — الملخص (150-250)، المقدمة (800-1000)، الأعمال السابقة (600-800)، المنهجية (1000-1500)، التجارب (800-1200)، النتائج (600-800)، المناقشة (400-600)
-- **حماية طول المراجعة** — إذا كانت الورقة المُراجَعة أقصر من المسودة، تُعاد المحاولة تلقائياً مع تطبيق أقوى؛ يعود للمسودة+التعليقات إذا لزم الأمر
-- **فرض مضاد لإخلاءات المسؤولية** — يحد من "بسبب القيود الحسابية" إلى حدوث واحد على الأكثر؛ أوامر المراجعة تزيل التحفظات المتكررة بنشاط
-- **صرامة إحصائية** — فترات الثقة وقيم p وأحجام التأثير مطلوبة في جداول النتائج؛ الاستئصالات المعطلة تُبلّغ وتُستبعد من الادعاءات
-- **مراجعة أقران بمعايير المؤتمرات** — المراجعون يقيّمون 1-10 وفق معايير NeurIPS/ICML (الجِدّة، خطوط الأساس، الاستئصالات، الادعاءات مقابل الأدلة، القيود)
-
-### 📐 تبديل قوالب المؤتمرات
+### التهيئة
 
 ```yaml
-export:
-  target_conference: "neurips_2025"   # or "iclr_2026" or "icml_2026"
+# config.arc.yaml
+hitl:
+  enabled: true
+  mode: co-pilot                     # full-auto | gate-only | checkpoint | co-pilot | custom
+  cost_budget_usd: 50.0              # توقف عند تجاوز التكلفة للميزانية (0 = بلا حد)
+
+  notifications:
+    on_pause: true
+    on_quality_drop: true
+    channels: ["terminal"]            # terminal | slack | webhook
+
+  timeouts:
+    default_human_timeout_sec: 86400  # 24 ساعة انتظار افتراضي
+    auto_proceed_on_timeout: false
+
+  collaboration:
+    max_chat_turns: 50
+    save_chat_history: true
+
+  # سياسات مخصصة لكل مرحلة (اختياري، لوضع 'custom')
+  stage_policies:
+    8: { require_approval: true, enable_collaboration: true }
+    9: { require_approval: true, allow_edit_output: true }
 ```
 
-| المؤتمر | حزمة النمط | الأعمدة |
-|------------|--------------|---------|
-| NeurIPS 2025 | `neurips_2025` | 1 |
-| ICLR 2026 | `iclr2026_conference` | 1 |
-| ICML 2026 | `icml2026` | 2 |
-| NeurIPS 2024 | `neurips_2024` | 1 |
-| ICLR 2025 | `iclr2025_conference` | 1 |
-| ICML 2025 | `icml2025` | 2 |
+### التوافق العكسي
 
-محوّل Markdown → LaTeX يتعامل مع: عناوين الأقسام (مع إزالة تكرار الترقيم التلقائي)، الرياضيات المضمّنة/المعروضة، الخط العريض/المائل، القوائم، الجداول (مع `\caption`/`\label`)، الأشكال (`\includegraphics`)، كتل الكود (آمنة لـ Unicode)، المراجع التبادلية، ومراجع `\cite{}`.
+- **الافتراضي: مُعطّل.** بدون `hitl.enabled: true` أو `--mode`، يعمل خط الأنابيب تماماً كما كان.
+- **`--auto-approve` لا يزال يعمل.** يتجاوز وضع HITL.
+- **جميع الاختبارات الـ 2,699 الحالية تنجح** مع وجود كود HITL.
 
-### 🚦 بوابات الجودة
+---
 
-| البوابة | المرحلة | عند الرفض → العودة إلى |
-|------|-------|---------------------------|
-| فرز الأدبيات | 5 | إعادة جمع الأدبيات (المرحلة 4) |
-| تصميم التجارب | 9 | إعادة توليد الفرضيات (المرحلة 8) |
-| بوابة الجودة | 20 | إعادة كتابة الورقة من المخطط (المرحلة 16) |
+## 🧠 تكامل MetaClaw
 
-استخدم `--auto-approve` لتخطي جميع البوابات، أو هيّئ مراحل محددة في `security.hitl_required_stages`.
+**AutoResearchClaw + [MetaClaw](https://github.com/aiming-lab/MetaClaw) = خط أنابيب يتعلم من كل تشغيل.**
+
+يضيف MetaClaw **نقل المعرفة عبر التشغيلات** إلى AutoResearchClaw. عند التفعيل، يلتقط خط الأنابيب تلقائياً الدروس من الإخفاقات والتحذيرات، ويحوّلها إلى مهارات قابلة لإعادة الاستخدام، ويحقنها في جميع مراحل خط الأنابيب الـ 23 في التشغيلات اللاحقة — بحيث لا تتكرر نفس الأخطاء أبداً.
+
+### كيف يعمل
+
+```
+Run N ينفّذ → الإخفاقات/التحذيرات تُلتقط كـ Lessons
+                      ↓
+          MetaClaw Lesson → تحويل إلى Skill
+                      ↓
+          ملفات arc-* Skill تُخزّن في ~/.metaclaw/skills/
+                      ↓
+Run N+1 → build_overlay() يحقن المهارات في كل أمر LLM
+                      ↓
+          LLM يتجنب المزالق المعروفة → جودة أعلى، محاولات أقل
+```
+
+### الإعداد السريع
+
+```bash
+# 1. تثبيت MetaClaw (إذا لم يكن مُثبّتاً)
+pip install metaclaw
+
+# 2. التفعيل في التهيئة
+```
+
+```yaml
+# config.arc.yaml
+metaclaw_bridge:
+  enabled: true
+  proxy_url: "http://localhost:30000"        # وكيل MetaClaw (اختياري)
+  skills_dir: "~/.metaclaw/skills"          # أين تُخزّن المهارات
+  fallback_url: "https://api.openai.com/v1" # بديل LLM مباشر
+  fallback_api_key: ""                      # مفتاح API لعنوان البديل
+  lesson_to_skill:
+    enabled: true
+    min_severity: "warning"                 # تحويل التحذيرات + الأخطاء
+    max_skills_per_run: 3
+```
+
+```bash
+# 3. شغّل كالمعتاد — MetaClaw يعمل بشفافية
+researchclaw run --config config.arc.yaml --topic "Your idea" --auto-approve
+```
+
+بعد كل تشغيل، تحقق من `~/.metaclaw/skills/arc-*/SKILL.md` لمشاهدة المهارات التي تعلّمها خط أنابيبك.
+
+### نتائج التجارب
+
+في تجارب A/B مُحكمة (نفس الموضوع، نفس LLM، نفس التهيئة):
+
+| المقياس | خط الأساس | مع MetaClaw | التحسين |
+|---------|----------|---------------|----------|
+| معدل إعادة المحاولة لكل مرحلة | 10.5% | 7.9% | **-24.8%** |
+| عدد دورات REFINE | 2.0 | 1.2 | **-40.0%** |
+| إكمال مراحل خط الأنابيب | 18/19 | 19/19 | **+5.3%** |
+| درجة المتانة الإجمالية (مركّبة) | 0.714 | 0.845 | **+18.3%** |
+
+> درجة المتانة المركّبة هي متوسط مرجّح لمعدل إكمال المراحل (40%) وتقليل المحاولات (30%) وكفاءة دورات REFINE (30%).
+
+### التوافق العكسي
+
+- **الافتراضي: مُعطّل.** إذا كان `metaclaw_bridge` غائباً أو `enabled: false`، يعمل خط الأنابيب تماماً كما كان.
+- **بدون تبعيات جديدة.** MetaClaw اختياري — خط الأنابيب الأساسي يعمل بدونه.
+- **جميع الاختبارات الـ 2,699 الحالية تنجح** مع وجود كود التكامل.
+
+---
+
+## 🧩 مكتبة المهارات
+
+يدعم AutoResearchClaw الآن تحميل **مهارات مفتوحة المصدر ومخصصة** لتعزيز تجربتك البحثية. نوفر أيضاً **19 مهارة مُدمجة مُحمّلة مسبقاً** (الكتابة العلمية، البحث في الأدبيات، الكيمياء، الأحياء، والمزيد) كمراجع جاهزة للاستخدام، توفر درجة عالية من المرونة فوراً. عطّل أي مهارة بإضافة `enabled: false` إلى بيانات YAML الوصفية.
+
+**نماذج من المهارات المُدمجة:**
+
+| الفئة | المهارة | الوصف |
+|----------|-------|-------------|
+| **الكتابة** | `scientific-writing` | بنية IMRAD، تنسيق الاستشهادات، إرشادات الإبلاغ |
+| **التخصص** | `chemistry-rdkit` | تحليل جزيئي، SMILES، بصمات جزيئية، اكتشاف الأدوية |
+| **التجارب** | `literature-search` | مراجعة منهجية، منهجية PRISMA |
+
+> شاهد جميع المهارات الـ 19 باستخدام `researchclaw skills list`.
+
+### تحميل مهاراتك الخاصة
+
+```bash
+# الخيار 1: تثبيت مهارة (تبقى عبر المشاريع)
+researchclaw skills install /path/to/my-skill/
+
+# الخيار 2: ضع SKILL.md في المشروع
+mkdir -p .claude/skills/my-custom-skill
+# ثم أنشئ SKILL.md مع بيانات YAML وصفية (name، description، trigger-keywords، applicable-stages)
+
+# الخيار 3: هيّئ مجلدات مهارات مشتركة في config.arc.yaml
+# skills:
+#   custom_dirs:
+#     - /path/to/team-shared-skills
+```
+
+### استخدام المهارات
+
+تُحمّل المهارات وتُحقن في أوامر LLM تلقائياً — لا حاجة لتفعيل يدوي. استخدم CLI للفحص:
+
+```bash
+researchclaw skills list               # عرض جميع المهارات المُحمّلة مع المصادر
+researchclaw skills validate ./my-skill # التحقق من تنسيق SKILL.md
+```
+
+تصفح مهارات المجتمع: [K-Dense-AI/claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) (150+ مهارة علمية عبر تخصصات متعددة).
 
 ---
 
@@ -463,18 +596,21 @@ runtime:
 
 # === نموذج اللغة ===
 llm:
-  provider: "openai-compatible"    # نوع المزوّد
-  base_url: "https://..."          # نقطة نهاية API (مطلوب)
-  api_key_env: "OPENAI_API_KEY"    # متغير بيئة لمفتاح API (مطلوب)
+  provider: "openai-compatible"    # openai | openrouter | deepseek | minimax | acp | openai-compatible
+  base_url: "https://..."          # نقطة نهاية API (مطلوب لـ openai-compatible)
+  api_key_env: "OPENAI_API_KEY"    # متغير بيئة لمفتاح API (مطلوب لـ openai-compatible)
   api_key: ""                      # أو ضع المفتاح هنا مباشرة
   primary_model: "gpt-4o"          # النموذج الأساسي
   fallback_models: ["gpt-4o-mini"] # سلسلة النماذج الاحتياطية
   s2_api_key: ""                   # مفتاح Semantic Scholar API (اختياري، حدود معدل أعلى)
+  acp:                             # يُستخدم فقط عند provider: "acp"
+    agent: "claude"                # أمر CLI لوكيل ACP (claude، codex، gemini، إلخ)
+    cwd: "."                       # دليل العمل للوكيل
 
 # === التجارب ===
 experiment:
   mode: "sandbox"                  # simulated | sandbox | docker | ssh_remote
-  time_budget_sec: 600             # أقصى وقت تنفيذ لكل تشغيل (الافتراضي: 600 ثانية)
+  time_budget_sec: 300             # أقصى وقت تنفيذ لكل تشغيل (الافتراضي: 300 ثانية)
   max_iterations: 10               # أقصى عدد تكرارات التحسين
   metric_key: "val_loss"           # اسم المقياس الأساسي
   metric_direction: "minimize"     # minimize | maximize
@@ -493,6 +629,50 @@ experiment:
     host: ""                       # اسم مضيف خادم GPU
     gpu_ids: []                    # معرّفات GPU المتاحة
     remote_workdir: "/tmp/researchclaw_experiments"
+  opencode:                          # OpenCode Beast Mode (يُثبّت تلقائياً عبر `researchclaw setup`)
+    enabled: true                    # المفتاح الرئيسي (الافتراضي: true)
+    auto: true                       # تشغيل تلقائي بدون تأكيد (الافتراضي: true)
+    complexity_threshold: 0.2        # 0.0-1.0 — أعلى = فقط للتجارب المعقدة
+    model: ""                        # تجاوز النموذج (فارغ = يستخدم llm.primary_model)
+    timeout_sec: 600                 # أقصى ثوانٍ لتوليد OpenCode
+    max_retries: 1                   # عدد المحاولات عند الفشل
+    workspace_cleanup: true          # حذف مساحة العمل المؤقتة بعد الجمع
+  code_agent:                        # CodeAgent v2 — توليد كود متعدد المراحل
+    enabled: true                    # استخدام CodeAgent بدلاً من التوليد القديم بأمر واحد
+    architecture_planning: true      # توليد مخطط تنفيذ تفصيلي قبل البرمجة
+    sequential_generation: true      # توليد الملفات واحداً تلو الآخر حسب رسم التبعيات DAG
+    hard_validation: true            # بوابات تحقق مبنية على AST (تمنع الاستئصالات المتطابقة والمقاييس المشفرة)
+    hard_validation_max_repairs: 2   # أقصى محاولات إصلاح عند فشل التحقق
+    exec_fix_max_iterations: 3       # محاولات إصلاح أثناء التنفيذ
+    exec_fix_timeout_sec: 60         # مهلة لكل محاولة إصلاح
+  benchmark_agent:                   # BenchmarkAgent — اختيار تلقائي لمجموعات البيانات وخطوط الأساس
+    enabled: true                    # تفعيل خط أنابيب من 4 وكلاء (Surveyor→Selector→Acquirer→Validator)
+    enable_hf_search: true           # البحث في HuggingFace Datasets
+    enable_web_search: true          # البحث عن المعايير في Google Scholar
+    tier_limit: 2                    # تصفية مستوى مجموعات البيانات (1=صغيرة/مخزنة، 2=متوسطة، 3=كبيرة)
+    min_benchmarks: 1                # الحد الأدنى لمجموعات البيانات المطلوبة
+    min_baselines: 2                 # الحد الأدنى لطرق خط الأساس المطلوبة
+  figure_agent:                      # FigureAgent — توليد أشكال أكاديمية
+    enabled: true                    # تفعيل خط أنابيب من 5 وكلاء (Planner→CodeGen→Renderer→Critic→Integrator)
+    min_figures: 3                   # الحد الأدنى للأشكال المُولّدة
+    max_figures: 8                   # الحد الأقصى للأشكال
+    max_iterations: 3                # تكرارات التحسين عبر Critic
+    dpi: 300                         # دقة المخرجات
+    strict_mode: false               # فشل خط الأنابيب إذا فشل توليد الأشكال
+  repair:                            # مكافحة التلفيق — إصلاح التجارب
+    enabled: true                    # تشخيص وإصلاح التجارب الفاشلة تلقائياً
+    max_cycles: 3                    # دورات الإصلاح
+    min_completion_rate: 0.5         # >=50% من الشروط يجب أن تكتمل للمتابعة
+    min_conditions: 2                # شرطان على الأقل لتجربة صالحة
+    use_opencode: true               # توجيه الإصلاحات عبر OpenCode Beast Mode
+
+# === البحث على الويب (اختياري) ===
+web_search:
+  enabled: true                      # تفعيل البحث في الأدبيات مع الويب
+  tavily_api_key_env: "TAVILY_API_KEY"  # متغير بيئة لمفتاح Tavily API (اختياري)
+  enable_scholar: true               # البحث في Google Scholar
+  enable_pdf_extraction: true        # استخلاص نص من ملفات PDF
+  max_web_results: 10                # أقصى نتائج ويب لكل استعلام
 
 # === التصدير ===
 export:
@@ -503,6 +683,23 @@ export:
 # === الأوامر النصية ===
 prompts:
   custom_file: ""                  # مسار ملف YAML للأوامر المخصصة (فارغ = الافتراضي)
+
+# === مساعد الطيار HITL (جديد في v0.4.0) ===
+hitl:
+  enabled: false                     # اضبط على true لتفعيل HITL
+  mode: co-pilot                     # full-auto | gate-only | checkpoint | step-by-step | co-pilot | custom
+  cost_budget_usd: 0.0              # حد التكلفة بالدولار (0 = بلا حد)
+  notifications:
+    on_pause: true                   # إشعار عند توقف خط الأنابيب
+    on_quality_drop: true            # إشعار عند مشاكل الجودة
+    channels: ["terminal"]           # terminal | slack | webhook
+  timeouts:
+    default_human_timeout_sec: 86400 # انتظار حتى 24 ساعة للمدخلات البشرية
+    auto_proceed_on_timeout: false   # إذا true، موافقة تلقائية عند انتهاء المهلة
+  collaboration:
+    max_chat_turns: 50               # أقصى عدد جولات لكل جلسة تعاون
+    save_chat_history: true          # حفظ سجلات المحادثة
+  stage_policies: {}                 # تجاوزات لكل مرحلة (لوضع 'custom')
 
 # === الأمان ===
 security:
@@ -519,6 +716,23 @@ knowledge_base:
 notifications:
   channel: "console"               # console | discord | slack
   target: ""
+
+# === جسر MetaClaw (اختياري) ===
+metaclaw_bridge:
+  enabled: false                   # اضبط على true لتفعيل التعلم عبر التشغيلات
+  proxy_url: "http://localhost:30000"  # عنوان وكيل MetaClaw
+  skills_dir: "~/.metaclaw/skills" # أين تُخزّن مهارات arc-*
+  fallback_url: ""                 # بديل LLM مباشر عند عدم توفر الوكيل
+  fallback_api_key: ""             # مفتاح API لنقطة نهاية البديل
+  lesson_to_skill:
+    enabled: true                  # تحويل الدروس إلى مهارات تلقائياً
+    min_severity: "warning"        # أدنى شدة للتحويل
+    max_skills_per_run: 3          # أقصى مهارات جديدة لكل تشغيل
+  prm:                             # بوابة جودة نموذج مكافأة العملية (اختياري)
+    enabled: false                 # استخدام LLM-as-judge لتقييم مخرجات المراحل
+    model: "gpt-5.4"              # نموذج حكم PRM
+    votes: 3                       # عدد التصويت بالأغلبية
+    gate_stages: [5, 9, 15, 20]   # المراحل لتطبيق بوابات PRM
 
 # === جسر OpenClaw ===
 openclaw_bridge:
@@ -544,9 +758,43 @@ openclaw_bridge:
 
 ---
 
+## ⚠️ الأخلاقيات والاستخدام المسؤول
+
+AutoResearchClaw هو أداة مساعدة في البحث، وليس بديلاً عن الباحثين البشريين. نطلب من جميع المستخدمين الالتزام بالمبادئ التالية:
+
+**النزاهة الأكاديمية.** يجب التعامل مع الأوراق البحثية التي يولدها AutoResearchClaw كمسودات تتطلب مراجعة بشرية شاملة والتحقق منها وتعديلها قبل التقديم. يتحمل المؤلفون المدرجون في الورقة المسؤولية الكاملة عن محتواها وادعاءاتها ودقتها. قد يؤدي استخدام نص مُولَّد بالذكاء الاصطناعي دون إشراف بشري كافٍ أو إفصاح إلى انتهاك سياسات النزاهة الأكاديمية لمؤسستك أو المؤتمر المستهدف.
+
+**الشفافية والإفصاح.** نوصي بشدة بالإفصاح عن استخدام AutoResearchClaw (أو أي مساعدة من الذكاء الاصطناعي) في المخطوطات، وفقاً لسياسات المؤتمر المستهدف (على سبيل المثال، تشترط NeurIPS وICML وICLR ومؤتمرات كبرى أخرى الآن الإفصاح عن مساعدة الذكاء الاصطناعي في الكتابة). يوجد نظام Co-Pilot مع الإنسان في الحلقة تحديداً للحفاظ على سيطرة بشرية ذات معنى على قرارات البحث.
+
+**الاستشهاد والإسناد.** يتحقق AutoResearchClaw من الاستشهادات عبر خط أنابيب من 4 طبقات، لكن لا يوجد نظام آلي مثالي. يجب على المستخدمين التحقق يدوياً قبل التقديم من أن جميع الاستشهادات حقيقية وذات صلة ومُستشهد بها بشكل صحيح. الاستشهادات المُلفقة أو المنسوبة خطأً تقوض الثقة العلمية.
+
+**مخاطر سوء الاستخدام.** كأي أداة قوية، يمكن إساءة استخدام AutoResearchClaw لإنتاج أبحاث منخفضة الجودة أو مضللة على نطاق واسع. نحن لا ندعم استخدام هذا النظام لإنشاء مصانع أوراق بحثية أو تقديمات احتيالية أو محتوى يهدف إلى التلاعب بمراجعة الأقران. في حالة اكتشاف إساءة استخدام منهجية، نحتفظ بالحق في تحديث الرخصة أو شروط الاستخدام.
+
+**الاستخدام المزدوج.** تثير أنظمة البحث المستقلة أسئلة أوسع حول مستقبل العمل العلمي ومعايير التأليف وعمليات المراجعة. نرحب بمناقشات المجتمع حول هذه المواضيع ونلتزم بتطوير هذه التقنية بشكل مسؤول.
+
+باستخدام AutoResearchClaw، فإنك توافق على استخدامه بطريقة تتوافق مع هذه المبادئ والإرشادات الأخلاقية لمؤسستك ومجتمعك البحثي.
+
+---
+
 ## 📄 الرخصة
 
 MIT — راجع [LICENSE](../LICENSE) للتفاصيل.
+
+---
+
+## 📌 الاستشهاد
+
+إذا وجدت AutoResearchClaw مفيداً، يرجى الاستشهاد:
+
+```bibtex
+@misc{liu2026autoresearchclaw,
+  author       = {Liu, Jiaqi and Xia, Peng and Han, Siwei and Qiu, Shi and Zhang, Letian and Chen, Guiming and Tu, Haoqin and Yang, Xinyu and Zhou, Jiawei and Zhu, Hongtu and Li, Yun and Zhang, Jiaheng and Zhou, Yuyin and Zheng, Zeyu and Xie, Cihang and Ding, Mingyu and Yao, Huaxiu},
+  title        = {AutoResearchClaw: Fully Autonomous Research from Idea to Paper},
+  year         = {2026},
+  organization = {GitHub},
+  url          = {https://github.com/aiming-lab/AutoResearchClaw},
+}
+```
 
 <p align="center">
   <sub>بُني بـ 🦞 بواسطة فريق AutoResearchClaw</sub>

@@ -37,12 +37,39 @@ openclaw_bridge:
 llm:
   provider: "openai-compatible"
   base_url: "https://api.openai.com/v1"
+  wire_api: "chat_completions"  # Set to "responses" for Responses-only gateways
   api_key_env: "OPENAI_API_KEY"
   api_key: ""
   primary_model: "gpt-4o"
   fallback_models:
     - "gpt-4.1"
     - "gpt-4o-mini"
+  # --- MiniMax provider example ---
+  # provider: "minimax"
+  # api_key_env: "MINIMAX_API_KEY"
+  # primary_model: "MiniMax-M2.5"
+  # fallback_models:
+  #   - "MiniMax-M2.5-highspeed"
+  # --- Volcengine provider examples ---
+  # provider: "volcengine"
+  # base_url: "https://ark.cn-beijing.volces.com/api/v3"
+  # api_key_env: "VOLCENGINE_API_KEY"
+  # primary_model: "doubao-seed-2-0-pro-260215"
+  #
+  # provider: "volcengine-coding-plan"
+  # base_url: "https://ark.cn-beijing.volces.com/api/coding/v3"
+  # api_key_env: "VOLCENGINE_API_KEY"
+  # primary_model: "doubao-seed-2.0-code"
+  #
+  # provider: "byteplus"
+  # base_url: "https://ark.ap-southeast.bytepluses.com/api/v3"
+  # api_key_env: "BYTEPLUS_API_KEY"
+  # primary_model: "seed-2-0-pro-260328"
+  #
+  # provider: "byteplus-coding-plan"
+  # base_url: "https://ark.ap-southeast.bytepluses.com/api/coding/v3"
+  # api_key_env: "BYTEPLUS_API_KEY"
+  # primary_model: "dola-seed-2.0-pro"
 
 security:
   hitl_required_stages: [5, 9, 20]
@@ -60,6 +87,7 @@ experiment:
   metric_key: "primary_metric"
   metric_direction: "minimize"
   sandbox:
+    # Use ".venv/Scripts/python.exe" on Windows
     python_path: ".venv/bin/python3"
     gpu_required: false
     max_memory_mb: 4096
@@ -70,7 +98,7 @@ experiment:
     gpu_enabled: true
     # gpu_device_ids: [0]        # empty = all GPUs
     memory_limit_mb: 8192
-    network_policy: "none"       # none | pip_only | full
+    network_policy: "setup_only"  # none | setup_only | pip_only | full
     # pip_pre_install: ["torchdiffeq", "einops"]
     auto_install_deps: true
     shm_size_mb: 2048
@@ -90,6 +118,16 @@ experiment:
     docker_network_policy: "none"   # none | full
     docker_memory_limit_mb: 8192
     docker_shm_size_mb: 2048
+  # OpenCode Beast Mode — external AI coding agent for complex experiments
+  # Install: npm i -g opencode-ai@latest  (or use `researchclaw setup`)
+  opencode:
+    enabled: true                # Master switch (default: true)
+    auto: true                   # Auto-trigger without confirmation (default: true)
+    complexity_threshold: 0.2    # 0.0-1.0 — higher = only trigger on complex experiments
+    model: ""                    # Override model (empty = use llm.primary_model)
+    timeout_sec: 600             # Max seconds for OpenCode generation
+    max_retries: 1               # Retry count on failure
+    workspace_cleanup: true      # Remove temp workspace after collection
 
 # ============================================================================
 # SSH Remote Examples

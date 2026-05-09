@@ -213,6 +213,40 @@ def test_read_prior_artifact_returns_none_when_not_found(run_dir: Path) -> None:
     assert rc_executor._read_prior_artifact(run_dir, "missing.md") is None
 
 
+def test_read_best_analysis_prefers_best_file(run_dir: Path) -> None:
+    """BUG-225: _read_best_analysis prefers analysis_best.md at run root."""
+    from researchclaw.pipeline._helpers import _read_best_analysis
+
+    # Create degenerate analysis in stage-14 and best at run root
+    s14 = run_dir / "stage-14"
+    s14.mkdir(parents=True)
+    (s14 / "analysis.md").write_text("Degenerate analysis", encoding="utf-8")
+    (run_dir / "analysis_best.md").write_text("Best analysis", encoding="utf-8")
+
+    result = _read_best_analysis(run_dir)
+    assert result == "Best analysis"
+
+
+def test_read_best_analysis_falls_back_to_prior_artifact(run_dir: Path) -> None:
+    """BUG-225: Falls back to _read_prior_artifact when no analysis_best.md."""
+    from researchclaw.pipeline._helpers import _read_best_analysis
+
+    s14 = run_dir / "stage-14"
+    s14.mkdir(parents=True)
+    (s14 / "analysis.md").write_text("Only analysis", encoding="utf-8")
+
+    result = _read_best_analysis(run_dir)
+    assert result == "Only analysis"
+
+
+def test_read_best_analysis_returns_empty_when_none(run_dir: Path) -> None:
+    """BUG-225: Returns empty string when no analysis exists at all."""
+    from researchclaw.pipeline._helpers import _read_best_analysis
+
+    result = _read_best_analysis(run_dir)
+    assert result == ""
+
+
 def test_write_stage_meta_writes_expected_json(run_dir: Path) -> None:
     stage_dir = run_dir / "stage-01"
     stage_dir.mkdir()
@@ -236,6 +270,29 @@ def test_write_stage_meta_writes_expected_json(run_dir: Path) -> None:
     assert payload["evidence_refs"] == ["stage-01/goal.md"]
     assert payload["next_stage"] == 2
     assert re.match(r"\d{4}-\d{2}-\d{2}T", payload["ts"])
+
+
+def test_write_stage_meta_keeps_paused_stage_as_next_stage(run_dir: Path) -> None:
+    stage_dir = run_dir / "stage-02"
+    stage_dir.mkdir()
+    result = rc_executor.StageResult(
+        stage=Stage.PROBLEM_DECOMPOSE,
+        status=StageStatus.PAUSED,
+        artifacts=("refinement_log.json",),
+        decision="resume",
+        error="ACP prompt timed out after 1800s",
+        evidence_refs=("stage-02/refinement_log.json",),
+    )
+    rc_executor._write_stage_meta(
+        stage_dir, Stage.PROBLEM_DECOMPOSE, "run-paused", result
+    )
+    payload = cast(
+        dict[str, Any],
+        json.loads((stage_dir / "decision.json").read_text(encoding="utf-8")),
+    )
+    assert payload["status"] == "paused"
+    assert payload["decision"] == "resume"
+    assert payload["next_stage"] == int(Stage.PROBLEM_DECOMPOSE)
 
 
 def test_execute_stage_creates_stage_dir_writes_artifacts_and_meta(
@@ -263,11 +320,10 @@ def test_execute_stage_creates_stage_dir_writes_artifacts_and_meta(
     assert "goal.md" in result.artifacts
     assert "hardware_profile.json" in result.artifacts
     assert (run_dir / "stage-01").is_dir()
-    assert (
-        (run_dir / "stage-01" / "goal.md")
-        .read_text(encoding="utf-8")
-        .startswith("# Goal")
-    )
+    goal_text = (run_dir / "stage-01" / "goal.md").read_text(encoding="utf-8")
+    # goal.md now starts with a disclaimer blockquote; the original content follows
+    assert "# Goal" in goal_text
+    assert "unverified draft" in goal_text  # disclaimer is present
     assert (run_dir / "stage-01" / "hardware_profile.json").exists()
     assert len(fake_llm.calls) == 1
 
@@ -716,6 +772,45 @@ class TestIterativeRefine:
         )
         assert payload["stop_reason"] == "llm_unavailable"
         assert result.status == StageStatus.DONE
+
+    def test_refine_acp_timeout_pauses_for_resume(
+        self,
+        run_dir: Path,
+        rc_config: RCConfig,
+        adapters: AdapterBundle,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self._prepare_refine_inputs(run_dir)
+        stage_dir = run_dir / "stage-13"
+        stage_dir.mkdir(parents=True, exist_ok=True)
+
+        from researchclaw.pipeline.stage_impls import _execution as execution_impl
+
+        def _timeout(*args, **kwargs):
+            _ = args, kwargs
+            raise RuntimeError("ACP prompt timed out after 1800s")
+
+        monkeypatch.setattr(execution_impl, "_chat_with_prompt", _timeout)
+
+        result = rc_executor._execute_iterative_refine(
+            stage_dir,
+            run_dir,
+            rc_config,
+            adapters,
+            llm=FakeLLMClient("unused"),
+        )
+
+        payload = json.loads(
+            (stage_dir / "refinement_log.json").read_text(encoding="utf-8")
+        )
+        assert result.status == StageStatus.PAUSED
+        assert result.decision == "resume"
+        assert result.artifacts == ("refinement_log.json",)
+        assert payload["paused"] is True
+        assert payload["stop_reason"] == "acp_prompt_timeout"
+        assert payload["pause_iteration"] == 1
+        assert payload["best_version"] == "experiment/"
+        assert not (stage_dir / "experiment_final").exists()
 
     def test_refine_with_llm_generates_improved_code(
         self,
@@ -2048,7 +2143,8 @@ class TestDataIntegrityBlock:
     """Test paper draft blocked when no metrics exist (R4-2a)."""
 
     def test_paper_draft_blocked_with_no_metrics(
-        self, tmp_path: Path, run_dir: Path, rc_config: RCConfig, adapters: AdapterBundle
+        self, tmp_path: Path, run_dir: Path, rc_config: RCConfig, adapters: AdapterBundle,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         # Write prior artifacts with NO metrics
         _write_prior_artifact(run_dir, 16, "outline.md", "# Outline\n## Abstract\n")
@@ -2062,6 +2158,13 @@ class TestDataIntegrityBlock:
 
         stage_dir = run_dir / "stage-17"
         stage_dir.mkdir(parents=True, exist_ok=True)
+
+        # Ensure domain detection returns an empirical domain so the block triggers
+        from researchclaw.pipeline.stage_impls import _paper_writing
+        monkeypatch.setattr(
+            _paper_writing, "_detect_domain",
+            lambda topic, domains=(): ("ml", "machine learning", "NeurIPS, ICML, ICLR"),
+        )
 
         llm = FakeLLMClient("should not be called")
         result = rc_executor._execute_paper_draft(
@@ -2420,8 +2523,10 @@ class TestExperimentHarness:
 
         sandbox.run_project(project, timeout_sec=5)
 
-        # Check that harness was injected
-        harness_path = tmp_path / "sandbox" / "_project" / "experiment_harness.py"
+        # Check that harness was injected (BUG-DA8-06: dir is now _project_{N})
+        project_dirs = list((tmp_path / "sandbox").glob("_project_*"))
+        assert project_dirs, "No _project_N directory found"
+        harness_path = project_dirs[0] / "experiment_harness.py"
         assert harness_path.exists()
         content = harness_path.read_text(encoding="utf-8")
         assert "ExperimentHarness" in content
@@ -2442,8 +2547,10 @@ class TestExperimentHarness:
 
         sandbox.run_project(project, timeout_sec=5)
 
-        # The real harness should be there, not the fake one
-        harness_path = tmp_path / "sandbox" / "_project" / "experiment_harness.py"
+        # The real harness should be there, not the fake one (BUG-DA8-06)
+        project_dirs = list((tmp_path / "sandbox").glob("_project_*"))
+        assert project_dirs
+        harness_path = project_dirs[0] / "experiment_harness.py"
         content = harness_path.read_text(encoding="utf-8")
         assert "ExperimentHarness" in content
         assert "FAKE HARNESS" not in content
@@ -3247,8 +3354,94 @@ class TestValidateDraftQuality:
         rc_executor._validate_draft_quality(draft, stage_dir=tmp_path)
         assert (tmp_path / "draft_quality.json").exists()
         data = json.loads(
-            (tmp_path / "draft_quality.json").read_text()
+            (tmp_path / "draft_quality.json").read_text(encoding="utf-8")
         )
         assert "section_analysis" in data
         assert "overall_warnings" in data
         assert "revision_directives" in data
+
+
+class TestExperimentValidatorPrecision:
+    def test_deep_validation_detects_undefined_helper_calls(self) -> None:
+        from researchclaw.experiment.validator import deep_validate_files
+
+        issues = deep_validate_files(
+            {
+                "main.py": (
+                    "def main():\n"
+                    "    create_empty_csv('tmp.csv', ['a'])\n\n"
+                    "if __name__ == '__main__':\n"
+                    "    main()\n"
+                )
+            }
+        )
+
+        assert any(
+            "Call to undefined function 'create_empty_csv()'" in issue
+            for issue in issues
+        )
+
+    def test_deep_validation_allows_inherited_single_core_method_subclass(
+        self,
+    ) -> None:
+        from researchclaw.experiment.validator import deep_validate_files
+
+        issues = deep_validate_files(
+            {
+                "main.py": (
+                    "class BaseVerifier:\n"
+                    "    def __init__(self, scale=1.0):\n"
+                    "        self.scale = float(scale)\n\n"
+                    "class ChildVerifier(BaseVerifier):\n"
+                    "    def predict(self, value):\n"
+                    "        total = value * self.scale\n"
+                    "        shifted = total + 1.0\n"
+                    "        centered = shifted - 0.5\n"
+                    "        bounded = max(centered, 0.0)\n"
+                    "        return {'score': bounded}\n"
+                )
+            }
+        )
+
+        assert not any(
+            "Class 'ChildVerifier' has only 1 non-dunder method" in issue
+            for issue in issues
+        )
+
+    def test_deep_validation_detects_duplicate_algorithm_classes_across_files(
+        self,
+    ) -> None:
+        from researchclaw.experiment.validator import deep_validate_files
+
+        issues = deep_validate_files(
+            {
+                "main.py": (
+                    "class DuplicateVerifier:\n"
+                    "    def __init__(self, bias=0.0):\n"
+                    "        self.bias = float(bias)\n\n"
+                    "    def predict(self, value):\n"
+                    "        shifted = value + self.bias\n"
+                    "        bounded = max(shifted, 0.0)\n"
+                    "        return {'score': bounded}\n"
+                ),
+                "models.py": (
+                    "class DuplicateVerifier:\n"
+                    "    def __init__(self, bias=0.0):\n"
+                    "        self.bias = float(bias)\n\n"
+                    "    def predict(self, value):\n"
+                    "        shifted = value + self.bias\n"
+                    "        bounded = max(shifted, 0.0)\n"
+                    "        return {'score': bounded}\n"
+                ),
+            }
+        )
+
+        assert any(
+            "Class 'DuplicateVerifier' is defined in multiple files" in issue
+            for issue in issues
+        )
+        assert not any(
+            "Classes 'DuplicateVerifier' and 'DuplicateVerifier' have identical"
+            in issue
+            for issue in issues
+        )

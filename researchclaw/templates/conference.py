@@ -83,11 +83,11 @@ class ConferenceTemplate:
             f"\n"
             f"\\begin{{document}}\n"
             f"{post_doc_author}"
-            f"\\maketitle\n"
-            f"\n"
             f"\\begin{{abstract}}\n"
             f"{abstract}\n"
             f"\\end{{abstract}}\n"
+            f"\n"
+            f"\\maketitle\n"
         )
 
     def render_footer(self, bib_file: str = "references") -> str:
@@ -154,7 +154,7 @@ NEURIPS_2024 = ConferenceTemplate(
     bib_style="plainnat",
     columns=1,
     style_download_url="https://media.neurips.cc/Conferences/NeurIPS2024/Styles.zip",
-    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}",
+    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{lmodern}",
 )
 
 ICLR_2025 = ConferenceTemplate(
@@ -239,7 +239,7 @@ NEURIPS_2025 = ConferenceTemplate(
     bib_style="plainnat",
     columns=1,
     style_download_url="https://media.neurips.cc/Conferences/NeurIPS2025/Styles.zip",
-    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}",
+    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{lmodern}",
 )
 
 ICLR_2026 = ConferenceTemplate(
@@ -289,6 +289,7 @@ ICML_2026 = ConferenceTemplate(
         "algorithm",
         "algorithmic",
         "adjustbox",
+        "morefloats",
     ),
     author_format="icml",
     bib_style="icml2026",
@@ -321,7 +322,7 @@ GENERIC = ConferenceTemplate(
     bib_style="plainnat",
     columns=1,
     style_download_url="",
-    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage[margin=1in]{geometry}",
+    preamble_extra="\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{lmodern}\n\\usepackage[margin=1in]{geometry}",
 )
 
 

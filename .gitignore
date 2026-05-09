@@ -51,8 +51,6 @@ docs/OPTIMIZATION_PLAN*.md
 docs/MULTI_CASE_EVALUATION*.md
 docs/pipeline_quality_issues*.md
 docs/autobench-loop.md
-RESEARCHCLAW_AGENTS.md
-RESEARCHCLAW_CLAUDE.md
 
 # Task-specific config files (keep example template only)
 config_agent_*.yaml
@@ -82,6 +80,9 @@ cli_pause
 /config.arc.yaml
 
 config_*.yaml
+
+# Frontend (local dev only)
+frontend/
 
 # Test outputs and run logs (local only)
 test_outputs*/

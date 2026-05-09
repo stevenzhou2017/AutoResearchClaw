@@ -26,6 +26,63 @@ from researchclaw.utils.thinking_tags import strip_thinking_tags
 logger = logging.getLogger(__name__)
 
 
+def _esc(s: str) -> str:
+    """Escape curly braces in user-provided strings for str.format()."""
+    return s.replace("{", "{{").replace("}", "}}")
+
+
+# ---------------------------------------------------------------------------
+# Degenerate data detection
+# ---------------------------------------------------------------------------
+
+def _is_degenerate_data(values: list[float]) -> bool:
+    """Return True if data values are too degenerate to produce a useful chart.
+
+    Rejects: empty lists, all-zero, all-identical, or single-value data.
+    """
+    if not values or len(values) < 1:
+        return True
+    if all(v == 0 for v in values):
+        return True
+    if len(values) >= 2 and len(set(round(v, 6) for v in values)) <= 1:
+        return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# Metric name humanization
+# ---------------------------------------------------------------------------
+
+_METRIC_DISPLAY_NAMES: dict[str, str] = {
+    "primary_metric": "Performance",
+    "accuracy": "Accuracy (%)",
+    "loss": "Loss",
+    "f1_score": "F1 Score",
+    "precision": "Precision",
+    "recall": "Recall",
+    "reward": "Reward",
+    "return": "Return",
+    "mse": "MSE",
+    "mae": "MAE",
+    "rmse": "RMSE",
+    "bleu": "BLEU",
+    "rouge": "ROUGE",
+    "perplexity": "Perplexity",
+    "auc": "AUC",
+}
+
+
+def _humanize_label(raw: str) -> str:
+    """Convert raw metric names like 'primary_metric' to human-readable labels."""
+    if not raw:
+        return ""
+    low = raw.lower().strip()
+    if low in _METRIC_DISPLAY_NAMES:
+        return _METRIC_DISPLAY_NAMES[low]
+    # Convert snake_case to Title Case
+    return raw.replace("_", " ").title()
+
+
 # ---------------------------------------------------------------------------
 # Built-in chart templates
 # ---------------------------------------------------------------------------
@@ -40,7 +97,7 @@ ci_low = {ci_low}
 ci_high = {ci_high}
 
 # Plot
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 x = np.arange(len(conditions))
 bar_colors = [COLORS[i % len(COLORS)] for i in range(len(conditions))]
 
@@ -54,16 +111,15 @@ ax.errorbar(x, values, yerr=[yerr_lo, yerr_hi],
 # Value labels
 offset = max(yerr_hi) * 0.08 if yerr_hi and max(yerr_hi) > 0 else max(values) * 0.02
 for i, v in enumerate(values):
-    ax.text(i, v + offset, f"{{v:.4f}}", ha="center", va="bottom", fontsize=9, fontweight="bold")
+    ax.text(i, v + offset, f"{{v:.4f}}", ha="center", va="bottom", fontweight="bold")
 
 ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
 ax.set_xticks(x)
-ax.set_xticklabels([c.replace("_", " ") for c in conditions], rotation=25, ha="right", fontsize=9)
+ax.set_xticklabels([c.replace("_", " ") for c in conditions], rotation=25, ha="right")
 ax.grid(True, axis="y", alpha=0.3)
 ax.set_axisbelow(True)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -81,7 +137,7 @@ data_matrix = {data_matrix}
 # Plot
 n_groups = len(conditions)
 n_bars = len(metric_names)
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 x = np.arange(n_groups)
 bar_width = 0.8 / n_bars
 
@@ -95,11 +151,10 @@ ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
 ax.set_xticks(x)
-ax.set_xticklabels([c.replace("_", " ") for c in conditions], rotation=25, ha="right", fontsize=9)
-ax.legend(framealpha=0.9, edgecolor="gray")
+ax.set_xticklabels([c.replace("_", " ") for c in conditions], rotation=25, ha="right")
+ax.legend(loc="upper left", bbox_to_anchor=(0, 1), framealpha=0.9, edgecolor="gray")
 ax.grid(True, axis="y", alpha=0.3)
 ax.set_axisbelow(True)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -111,7 +166,7 @@ _TEMPLATE_TRAINING_CURVE = '''
 # Data: each series is (label, epochs, values, [optional std])
 series_data = {series_data}
 
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 
 for idx, series in enumerate(series_data):
     label = series["label"]
@@ -134,9 +189,8 @@ for idx, series in enumerate(series_data):
 ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
-ax.legend(framealpha=0.9, edgecolor="gray")
+ax.legend(loc="best", framealpha=0.9, edgecolor="gray")
 ax.grid(True, alpha=0.3)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -150,26 +204,25 @@ row_labels = {row_labels}
 col_labels = {col_labels}
 data = np.array({data_matrix})
 
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 im = ax.imshow(data, cmap="cividis", aspect="auto")
 
 ax.set_xticks(np.arange(len(col_labels)))
 ax.set_yticks(np.arange(len(row_labels)))
-ax.set_xticklabels(col_labels, rotation=45, ha="right", fontsize=9)
-ax.set_yticklabels(row_labels, fontsize=9)
+ax.set_xticklabels(col_labels, rotation=45, ha="right")
+ax.set_yticklabels(row_labels)
 
 # Annotate cells
 for i in range(len(row_labels)):
     for j in range(len(col_labels)):
         val = data[i, j]
         color = "white" if val > (data.max() + data.min()) / 2 else "black"
-        ax.text(j, i, f"{{val:.3f}}", ha="center", va="center", color=color, fontsize=9)
+        ax.text(j, i, f"{{val:.3f}}", ha="center", va="center", color=color)
 
 ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
 fig.colorbar(im, ax=ax, shrink=0.8)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -181,7 +234,7 @@ _TEMPLATE_LINE_MULTI = '''
 # Data: list of series dicts with label, x, y, [std]
 series_data = {series_data}
 
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 
 for idx, series in enumerate(series_data):
     label = series["label"]
@@ -204,9 +257,8 @@ for idx, series in enumerate(series_data):
 ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
-ax.legend(framealpha=0.9, edgecolor="gray")
+ax.legend(loc="best", framealpha=0.9, edgecolor="gray")
 ax.grid(True, alpha=0.3)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -218,7 +270,7 @@ _TEMPLATE_SCATTER = '''
 # Data: list of groups with label, x, y
 groups = {groups}
 
-fig, ax = plt.subplots(figsize=({width}, {height}))
+fig, ax = plt.subplots(figsize=({width}, {height}), constrained_layout=True)
 
 for idx, group in enumerate(groups):
     label = group["label"]
@@ -231,9 +283,8 @@ for idx, group in enumerate(groups):
 ax.set_xlabel("{x_label}")
 ax.set_ylabel("{y_label}")
 ax.set_title("{title}")
-ax.legend(framealpha=0.9, edgecolor="gray")
+ax.legend(loc="best", framealpha=0.9, edgecolor="gray")
 ax.grid(True, alpha=0.3)
-fig.tight_layout()
 fig.savefig("{output_path}")
 plt.close(fig)
 print(f"Saved: {output_path}")
@@ -360,9 +411,10 @@ class CodeGenAgent(BaseAgent):
 
     name = "figure_codegen"
 
-    def __init__(self, llm: Any, *, output_format: str = "python") -> None:
+    def __init__(self, llm: Any, *, output_format: str = "python", use_docker: bool = False) -> None:
         super().__init__(llm)
         self._output_format = output_format  # "python" or "latex"
+        self._use_docker = use_docker  # BUG-60: generate Docker paths when True
 
     # ------------------------------------------------------------------
     # Public API
@@ -402,7 +454,8 @@ class CodeGenAgent(BaseAgent):
                 # Check for critic feedback on this specific figure
                 fig_feedback = None
                 for fb in critic_feedback:
-                    if fb.get("figure_id") == figure_id:
+                    # BUG-FIX: guard against non-dict entries in feedback
+                    if isinstance(fb, dict) and fb.get("figure_id") == figure_id:
                         fig_feedback = fb
                         break
 
@@ -452,12 +505,25 @@ class CodeGenAgent(BaseAgent):
         """Generate a plotting script for a single figure."""
         figure_id = sanitize_figure_id(fig_spec.get("figure_id", "figure"))
         # BUG-20: Use absolute path to avoid CWD-relative savefig errors
-        output_path = str((Path(output_dir) / f"{figure_id}.png").resolve())
+        # BUG-60: When running in Docker, use container path directly so
+        # renderer doesn't need fragile regex rewriting of host paths.
+        if self._use_docker:
+            output_path = f"/workspace/output/{figure_id}.png"
+        else:
+            output_path = str((Path(output_dir) / f"{figure_id}.png").resolve())
         title = fig_spec.get("title", "")
         x_label = fig_spec.get("x_label", "")
         y_label = fig_spec.get("y_label", "")
         width_key = fig_spec.get("width", "single_column")
-        data_source = fig_spec.get("data_source", {})
+        # BUG-FIX: LLM may return data_source as a plain string (e.g.
+        # "condition_comparison") instead of a dict.  Normalize to dict.
+        _raw_ds = fig_spec.get("data_source", {})
+        if isinstance(_raw_ds, str):
+            data_source = {"type": _raw_ds}
+        elif isinstance(_raw_ds, dict):
+            data_source = _raw_ds
+        else:
+            data_source = {}
 
         from researchclaw.agents.figure_agent.style_config import FIGURE_WIDTH, DEFAULT_FIGURE_HEIGHT
         width = FIGURE_WIDTH.get(width_key, FIGURE_WIDTH["single_column"])
@@ -480,6 +546,7 @@ class CodeGenAgent(BaseAgent):
                 y_label=y_label,
                 width=width,
                 height=height,
+                width_key=width_key,
             )
             if script:
                 return script
@@ -496,6 +563,7 @@ class CodeGenAgent(BaseAgent):
             width=width,
             height=height,
             critic_feedback=critic_feedback,
+            width_key=width_key,
         )
 
     def _fill_template(
@@ -514,9 +582,10 @@ class CodeGenAgent(BaseAgent):
         y_label: str,
         width: float,
         height: float,
+        width_key: str = "single_column",
     ) -> str:
         """Fill a template with actual data values."""
-        style_preamble = get_style_preamble()
+        style_preamble = get_style_preamble(width_key=width_key)
         source_type = data_source.get("type", "condition_comparison")
 
         if chart_type in ("bar_comparison", "ablation_grouped"):
@@ -614,6 +683,17 @@ class CodeGenAgent(BaseAgent):
         if not conditions:
             return ""
 
+        # Skip degenerate data (all zeros, all identical)
+        if _is_degenerate_data(values):
+            logger.warning("Skipping degenerate bar chart: all values are identical or zero")
+            return ""
+
+        # Humanize empty/raw labels
+        if not y_label or y_label.lower().replace("_", "") in ("primarymetric", "metric"):
+            y_label = _humanize_label(metric_key)
+        if not x_label:
+            x_label = "Method"
+
         return template.format(
             style_preamble=style_preamble,
             conditions=repr(conditions),
@@ -621,9 +701,9 @@ class CodeGenAgent(BaseAgent):
             ci_low=repr(ci_low),
             ci_high=repr(ci_high),
             output_path=output_path,
-            title=title,
-            x_label=x_label,
-            y_label=y_label,
+            title=_esc(title),
+            x_label=_esc(x_label),
+            y_label=_esc(y_label),
             width=width,
             height=height,
         )
@@ -666,9 +746,9 @@ class CodeGenAgent(BaseAgent):
             metric_names=repr(metrics),
             data_matrix=repr(data_matrix),
             output_path=output_path,
-            title=title,
-            x_label=x_label,
-            y_label=y_label,
+            title=_esc(title),
+            x_label=_esc(x_label),
+            y_label=_esc(y_label),
             width=width,
             height=height,
         )
@@ -711,15 +791,26 @@ class CodeGenAgent(BaseAgent):
                     row.append(0.0)
             data_matrix.append(row)
 
+        # Skip degenerate heatmaps (all values identical)
+        all_vals = [v for row in data_matrix for v in row]
+        if _is_degenerate_data(all_vals):
+            logger.warning("Skipping degenerate heatmap: all values are identical or zero")
+            return ""
+
+        # Also skip single-row heatmaps (meaningless)
+        if len(conditions) < 2:
+            logger.warning("Skipping heatmap with only %d row(s)", len(conditions))
+            return ""
+
         return template.format(
             style_preamble=style_preamble,
             row_labels=repr(conditions),
             col_labels=repr(metric_names),
             data_matrix=repr(data_matrix),
             output_path=output_path,
-            title=title,
-            x_label=x_label or "Metric",
-            y_label=y_label or "Method",
+            title=_esc(title),
+            x_label=_esc(x_label or "Metric"),
+            y_label=_esc(y_label or "Method"),
             width=max(width, len(metric_names) * 0.8),
             height=max(height, len(conditions) * 0.6),
         )
@@ -741,6 +832,7 @@ class CodeGenAgent(BaseAgent):
         width: float,
         height: float,
         critic_feedback: dict[str, Any] | None,
+        width_key: str = "single_column",
     ) -> str:
         """Generate a plotting script using LLM."""
         if self._output_format == "latex":
@@ -755,7 +847,7 @@ class CodeGenAgent(BaseAgent):
                 critic_feedback=critic_feedback,
             )
 
-        style_preamble = get_style_preamble()
+        style_preamble = get_style_preamble(width_key=width_key)
 
         system_prompt = (
             "You are an expert scientific visualization programmer. "
@@ -769,8 +861,15 @@ class CodeGenAgent(BaseAgent):
             "- Output format: PNG at 300 DPI\n"
             "- Use colorblind-safe colors from the COLORS list\n"
             "- Include descriptive axis labels and title\n"
+            "- Use constrained_layout=True in plt.subplots() — do NOT call fig.tight_layout()\n"
             "- Call fig.savefig() and plt.close(fig) at the end\n"
             "- Print 'Saved: <path>' after saving\n"
+            "- NEVER embed caption, description, or subtitle text inside the figure "
+            "using fig.text() or ax.text() for long descriptions. "
+            "All captions are added by LaTeX \\caption{}\n"
+            "- Place legends OUTSIDE the data area when possible. "
+            "Use bbox_to_anchor=(1.02, 1) with loc='upper left' for legends "
+            "that would overlap bars or data points\n"
             "- Do NOT include any <think> or </think> tags\n\n"
             "Return ONLY the Python script, no explanation."
         )
