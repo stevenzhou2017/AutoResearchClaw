@@ -115,6 +115,37 @@ def _execute_experiment_design(
         )
     except Exception:  # noqa: BLE001
         logger.debug("Domain detection unavailable", exc_info=True)
+
+    # --- Domain-specific experiment design context (YAML-driven overlay) ---
+    # For ML and HEP, the active prompt bank is already domain-native so we
+    # leave this empty. For other profiles (biology, physics, economics, …)
+    # the GenericPromptAdapter injects YAML-defined guidance here.
+    _domain_design_context = ""
+    if _domain_profile is not None:
+        try:
+            from researchclaw.domains.prompt_adapter import get_adapter as _get_prompt_adapter
+            _adapter = _get_prompt_adapter(_domain_profile)
+            _design_blocks = _adapter.get_experiment_design_blocks(
+                {"topic": config.research.topic}
+            )
+            if _design_blocks.experiment_design_context:
+                _domain_design_context = (
+                    "## Domain-Specific Experiment Guidelines\n"
+                    + _design_blocks.experiment_design_context
+                    + "\n\n"
+                )
+                if _design_blocks.statistical_test_guidance:
+                    _domain_design_context += (
+                        "## Statistical Analysis Guidance\n"
+                        + _design_blocks.statistical_test_guidance + "\n\n"
+                    )
+                logger.info(
+                    "ExperimentDesign: injecting YAML-driven domain context for %s",
+                    _domain_profile.domain_id,
+                )
+        except Exception:  # noqa: BLE001
+            logger.debug("Domain experiment design context unavailable", exc_info=True)
+
     if llm is not None:
         _pm = prompts or PromptManager()
         # Pass dataset_guidance block for experiment design
@@ -173,6 +204,7 @@ def _execute_experiment_design(
             preamble=preamble,
             hypotheses=hypotheses,
             dataset_guidance=_dg_block,
+            domain_design_context=_domain_design_context,
             time_budget_sec=config.experiment.time_budget_sec,
             metric_key=config.experiment.metric_key,
             metric_direction=config.experiment.metric_direction,
@@ -310,6 +342,44 @@ def _execute_experiment_design(
             "risks": ["validity threats", "confounding variables"],
             "compute_budget": {"max_gpu": 1, "max_hours": 4},
         }
+
+    # Schema-deficit guard: when the LLM returned a parseable dict that
+    # bypassed every fallback cascade (because plan was never None) but
+    # lacks any actual experiment content, pause rather than silently
+    # advancing a content-empty plan to code generation.  Use
+    # _normalize_plan_field so the guard accepts every shape the rest of
+    # this file already supports (str, dict, list[str], list[dict]).
+    _required_any = ("baselines", "proposed_methods", "ablations")
+    _normalized = {k: _normalize_plan_field(plan.get(k)) for k in _required_any}
+    if not any(_normalized.values()):
+        (stage_dir / "plan_meta.json").write_text(
+            json.dumps(
+                {
+                    "outcome": "model_response_schema_deficient",
+                    "missing_required_keys": [
+                        k for k in _required_any if not _normalized[k]
+                    ],
+                    "received_keys": sorted(plan.keys()),
+                    "note": (
+                        "Experiment plan parsed but lacked baselines, proposed_methods, "
+                        "and ablations. Pipeline paused; refine the prompt or rerun stage."
+                    ),
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        logger.warning(
+            "Stage 9: model plan parsed but missing required content keys — pausing pipeline"
+        )
+        return StageResult(
+            stage=Stage.EXPERIMENT_DESIGN,
+            status=StageStatus.PAUSED,
+            artifacts=("plan_meta.json",),
+            error="Experiment plan missing baselines/proposed_methods/ablations",
+            evidence_refs=("stage-09/plan_meta.json",),
+            decision="schema_deficient",
+        )
     # ── BA: BenchmarkAgent — intelligent dataset/baseline selection ──────
     _benchmark_plan = None
     # BUG-40: Skip BenchmarkAgent for non-ML domains — it has no relevant

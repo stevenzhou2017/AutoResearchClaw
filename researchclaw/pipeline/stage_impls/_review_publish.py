@@ -173,10 +173,15 @@ def _execute_peer_review(
             draft=draft,
             experiment_evidence=experiment_evidence,
         )
+
+        # Reviewer persona and rubric are carried natively by the active
+        # prompt bank (ML bank -> NeurIPS/ICML referees, HEP bank -> HEP
+        # theorist/phenomenologist/experimentalist). No adapter overlay.
+        _review_system = sp.system
         _review_user = sp.user + _quality_suffix
         resp = _chat_with_prompt(
             llm,
-            sp.system,
+            _review_system,
             _review_user,
             json_mode=sp.json_mode,
             max_tokens=sp.max_tokens,
@@ -275,6 +280,11 @@ def _execute_paper_revision(
             reviews=_quality_prefix + reviews + data_integrity_revision,
             **_rev_blocks,
         )
+
+        # Revision system prompt and rules are carried natively by the active
+        # prompt bank; no adapter overlay.
+        _revision_system = sp.system
+        _revision_user = sp.user
         # R10-Fix2: Ensure max_tokens is sufficient for full paper revision
         revision_max_tokens = sp.max_tokens
         if revision_max_tokens and draft_word_count > 0:
@@ -291,8 +301,8 @@ def _execute_paper_revision(
         # R10-Fix4: Retry on timeout for paper revision (critical stage)
         resp = _chat_with_prompt(
             llm,
-            sp.system,
-            sp.user,
+            _revision_system,
+            _revision_user,
             json_mode=sp.json_mode,
             max_tokens=revision_max_tokens,
             retries=2,
@@ -313,10 +323,10 @@ def _execute_paper_revision(
                 f"Do NOT summarize or condense ANY section. Copy each section verbatim "
                 f"and ONLY make targeted improvements to address reviewer comments. "
                 f"If a section has no reviewer comments, include it UNCHANGED.\n\n"
-                + sp.user
+                + _revision_user
             )
             resp2 = _chat_with_prompt(
-                llm, sp.system, retry_user,
+                llm, _revision_system, retry_user,
                 json_mode=sp.json_mode, max_tokens=revision_max_tokens,
             )
             revised2 = resp2.content
@@ -551,24 +561,39 @@ def _execute_quality_gate(
     _fabrication_info["fabrication_suspected"] = (
         _exp_failed and not _fabrication_info["has_real_data"]
     )
-    # Phase 1: Enhanced fabrication detection via VerifiedRegistry
-    # BUG-108: Also pass refinement_log so NaN best_metric is properly handled
-    _rl20_candidates = sorted(run_dir.glob("stage-13*/refinement_log.json"), reverse=True)
-    _rl20_path = _rl20_candidates[0] if _rl20_candidates else None
-    _rl20: dict | None = None
-    if _rl20_path and _rl20_path.is_file():
-        try:
-            _rl20 = json.loads(_rl20_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            pass
+    # --- Hard guard: block if VerifiedRegistry has zero real experiment values ---
+    # Even if the LLM gives a passing score, a paper with no verified
+    # experiment data must not proceed to export. This prevents the exact
+    # failure in issue #165 where a 3.46s "experiment" produced a fabricated
+    # paper that passed the quality gate.
+    _vr_zero_values = False
     try:
         from researchclaw.pipeline.verified_registry import VerifiedRegistry as _VR20
         _vr20 = _VR20.from_run_dir(run_dir, metric_direction=config.experiment.metric_direction, best_only=True) if isinstance(_exp_summary, dict) else None
         if _vr20:
             _fabrication_info["verified_values_count"] = len(_vr20.values)
             _fabrication_info["verified_conditions"] = sorted(_vr20.condition_names)
+            if len(_vr20.values) == 0 and _exp_failed:
+                _vr_zero_values = True
     except Exception:
         pass
+    if _vr_zero_values:
+        logger.error(
+            "Stage 20 BLOCKED: VerifiedRegistry has zero real experiment values "
+            "and experiment summary reports failure. The paper's numerical results "
+            "cannot be grounded in real data. Refusing to proceed."
+        )
+        return StageResult(
+            stage=Stage.QUALITY_GATE,
+            status=StageStatus.FAILED,
+            artifacts=("quality_report.json", "fabrication_flags.json"),
+            evidence_refs=("stage-20/quality_report.json",),
+            error=(
+                "Quality gate BLOCKED: VerifiedRegistry has zero real experiment "
+                "values and experiment failed. Paper contains no grounded data. "
+                "Pipeline must not proceed to export."
+            ),
+        )
     (stage_dir / "fabrication_flags.json").write_text(
         json.dumps(_fabrication_info, indent=2), encoding="utf-8"
     )
@@ -1418,14 +1443,34 @@ def _execute_export_publish(
     prompts: PromptManager | None = None,
 ) -> StageResult:
     revised = _read_prior_artifact(run_dir, "paper_revised.md") or ""
+
+    # --- Detect domain once for export-stage formatting decisions ---
+    _export_preferred_template = ""
+    _export_guidance = ""
+    _export_is_hep = False
+    try:
+        from researchclaw.domains.detector import detect_domain as _detect_domain_adv
+        from researchclaw.domains.prompt_adapter import get_adapter as _get_prompt_adapter
+        _ex_domain = _detect_domain_adv(topic=config.research.topic)
+        _ex_adapter = _get_prompt_adapter(_ex_domain)
+        _ex_blocks = _ex_adapter.get_export_publish_blocks({"topic": config.research.topic})
+        _export_preferred_template = _ex_blocks.preferred_template or ""
+        _export_guidance = _ex_blocks.export_publish_guidance or ""
+        _export_is_hep = getattr(_ex_domain, "domain_id", "").startswith("hep_ph")
+    except Exception:  # noqa: BLE001
+        pass
+
     if llm is not None:
         _pm = prompts or PromptManager()
         _overlay = _get_evolution_overlay(run_dir, "export_publish")
         sp = _pm.for_stage("export_publish", evolution_overlay=_overlay, revised=revised)
+        _export_user = sp.user
+        if _export_guidance:
+            _export_user = _export_guidance + "\n\n" + _export_user
         resp = _chat_with_prompt(
             llm,
             sp.system,
-            sp.user,
+            _export_user,
             json_mode=sp.json_mode,
             max_tokens=sp.max_tokens,
         )
@@ -2010,14 +2055,33 @@ def _execute_export_publish(
 
     # Conference template: generate .tex file
     try:
-        from researchclaw.templates import get_template, markdown_to_latex
+        from researchclaw.templates import (
+            ML_CHECKLIST_TEMPLATES,
+            get_template,
+            markdown_to_latex,
+        )
 
-        tpl = get_template(config.export.target_conference)
+        # Auto-select a physics template for hep_ph papers IFF the user has
+        # left target_conference at the ML default (neurips_2025). Explicit
+        # user choices are always respected.
+        _requested_conf = config.export.target_conference
+        _conf_name = _requested_conf
+        if (
+            _export_preferred_template
+            and _requested_conf == "neurips_2025"
+        ):
+            _conf_name = _export_preferred_template
+            logger.info(
+                "Stage 22: domain=hep_ph detected — overriding default "
+                "target_conference='neurips_2025' with '%s' (physics template).",
+                _conf_name,
+            )
+        tpl = get_template(_conf_name)
         # Use the latex-citation-processed version if available
         tex_source = final_paper_latex
-        # Append NeurIPS-style checklist if target is a ML conference
-        if tpl.name in ("neurips_2024", "neurips_2025", "icml_2025", "icml_2026",
-                         "iclr_2025", "iclr_2026"):
+        # Append NeurIPS-style checklist only for ML conference targets.
+        # HEP / EPJC / generic targets do not get an ML reproducibility checklist.
+        if tpl.name in ML_CHECKLIST_TEMPLATES and not _export_is_hep:
             _has_exp = bool(_read_prior_artifact(run_dir, "experiment_summary.json"))
             _checklist = _generate_neurips_checklist(
                 has_experiments=_has_exp,
@@ -2043,7 +2107,16 @@ def _execute_export_publish(
         )
         # --- Phase 1 anti-fabrication: verify paper against VerifiedRegistry ---
         _vresult = None  # BUG-DA8-04: Initialize before try to avoid fragile dir() check
+        # Ablation hook: ARC_ABL_DISABLE_REGISTRY=1 skips the entire
+        # fabrication-detection + sanitization block so unverified numbers
+        # remain in the exported paper. Used by experiments/component_ablation only.
+        import os as _os_abl  # noqa: PLC0415
+        _abl_skip_registry = _os_abl.environ.get("ARC_ABL_DISABLE_REGISTRY", "").strip() == "1"
+        if _abl_skip_registry:
+            logger.info("ARC_ABL_DISABLE_REGISTRY=1 — skipping Stage-22 paper verification")
         try:
+            if _abl_skip_registry:
+                raise RuntimeError("ablation: registry disabled")
             from researchclaw.pipeline.paper_verifier import verify_paper as _verify_paper
             # BUG-222: Use best_only=True to validate against promoted best data only
             from researchclaw.pipeline.verified_registry import (

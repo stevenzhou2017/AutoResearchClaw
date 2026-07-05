@@ -265,7 +265,7 @@ def _write_example_config(path: Path) -> None:
 project:
   name: "my-research"
 llm:
-  provider: "openai-compatible"
+  provider: "openai"
   base_url: "https://api.openai.com/v1"
   api_key_env: "OPENAI_API_KEY"
   primary_model: "gpt-4o"
@@ -320,27 +320,24 @@ def test_cmd_init_force_overwrites(
     assert (tmp_path / "config.arc.yaml").read_text(encoding="utf-8") != "old\n"
 
 
-def test_cmd_init_supports_volcengine_coding_plan_choice(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+def test_cmd_init_acp_disables_opencode(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
+    """When provider=acp is selected, OpenCode Beast Mode is disabled in the generated config."""
     monkeypatch.chdir(tmp_path)
-    _write_example_config(tmp_path / "config.researchclaw.example.yaml")
+    monkeypatch.setattr(
+        "sys.stdin", type("FakeStdin", (), {"isatty": lambda self: True})()
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt: "5")
+    monkeypatch.setattr(rc_cli, "_prompt_opencode_install", lambda: None)
 
-    class _FakeStdin:
-        def isatty(self) -> bool:
-            return True
-
-    monkeypatch.setattr("sys.stdin", _FakeStdin())
-    monkeypatch.setattr("builtins.input", lambda _prompt="": "6")
-
-    code = rc_cli.cmd_init(argparse.Namespace(force=False))
-
+    args = argparse.Namespace(force=False)
+    code = rc_cli.cmd_init(args)
     assert code == 0
-    content = (tmp_path / "config.arc.yaml").read_text(encoding="utf-8")
-    assert 'provider: "volcengine-coding-plan"' in content
-    assert 'base_url: "https://ark.cn-beijing.volces.com/api/coding/v3"' in content
-    assert 'api_key_env: "VOLCENGINE_API_KEY"' in content
-    assert 'primary_model: "doubao-seed-2.0-code"' in content
+
+    config = (tmp_path / "config.arc.yaml").read_text(encoding="utf-8")
+    assert "enabled: false               # Master switch (disabled for ACP)" in config
+    assert "enabled: true                # Master switch (default: true)" not in config
 
 
 def test_cmd_run_missing_config_shows_init_hint(
